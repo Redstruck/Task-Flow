@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckSquare, Settings, Calendar, Plug, Search, BookTemplate as Template, Keyboard, BarChart3 } from 'lucide-react';
+import { CheckSquare, Settings, Calendar, Search, BookTemplate as Template, Keyboard, BarChart3 } from 'lucide-react';
 import SearchBar from './SearchBar';
 import { SearchFilters } from '../types';
 
@@ -10,7 +10,6 @@ interface HeaderProps {
   onShowTemplates: () => void;
   onShowShortcuts: () => void;
   onShowAnalytics: () => void;
-  onShowIntegrations: () => void;
   onShowCalendar: () => void;
   onShowSettings: () => void;
 }
@@ -22,7 +21,6 @@ const Header: React.FC<HeaderProps> = ({
   onShowTemplates,
   onShowShortcuts,
   onShowAnalytics,
-  onShowIntegrations,
   onShowCalendar,
   onShowSettings,
 }) => {
@@ -73,14 +71,6 @@ const Header: React.FC<HeaderProps> = ({
             title="Keyboard Shortcuts"
           >
             <Keyboard className="w-5 h-5 transition-transform group-hover:scale-110" />
-          </button>
-          
-          <button 
-            onClick={onShowIntegrations}
-            className="group relative p-3 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200 hover:shadow-md"
-            title="Integrations"
-          >
-            <Plug className="w-5 h-5 transition-transform group-hover:scale-110" />
           </button>
           
           <button 

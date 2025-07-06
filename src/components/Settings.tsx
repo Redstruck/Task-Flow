@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, X, Bell, Keyboard, Palette, Clock, Globe, Download, Upload, Trash2, Moon, Sun, Monitor, Focus, Shield, Zap, Info, AlertCircle, CheckCircle, Target } from 'lucide-react';
+import { Settings as SettingsIcon, X, Bell, Keyboard, Palette, Clock, Globe, Download, Upload, Trash2, Moon, Sun, Monitor, Focus, Shield, Info, AlertCircle, CheckCircle, Target } from 'lucide-react';
 import { AppSettings, NotificationSettings, ProductivitySettings } from '../types';
 
 interface SettingsProps {
@@ -518,7 +518,7 @@ const Settings: React.FC<SettingsProps> = ({
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Productivity Goals" icon={Zap}>
+      <SettingsCard title="Productivity Goals" icon={Target}>
         <div className="grid grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Daily Tasks Target</label>

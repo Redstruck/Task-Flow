@@ -17,7 +17,6 @@ export interface Task {
   completedAt?: Date;
   comments?: Comment[];
   watchers?: string[];
-  aiSuggestions?: AISuggestion[];
   dependencies?: TaskDependency[];
   customFields?: CustomField[];
   workflowStage?: string;
@@ -29,17 +28,6 @@ export interface Task {
   sprintId?: string;
   epicId?: string;
   storyPoints?: number;
-  automationRules?: AutomationRule[];
-}
-
-export interface AISuggestion {
-  id: string;
-  type: 'priority' | 'time_estimate' | 'dependency' | 'optimization' | 'breakdown';
-  suggestion: string;
-  confidence: number; // 0-1
-  reasoning: string;
-  createdAt: Date;
-  applied?: boolean;
 }
 
 export interface TaskDependency {
@@ -56,32 +44,6 @@ export interface CustomField {
   value: any;
   options?: string[]; // For select/multiselect
   required?: boolean;
-}
-
-export interface AutomationRule {
-  id: string;
-  name: string;
-  trigger: AutomationTrigger;
-  conditions: AutomationCondition[];
-  actions: AutomationAction[];
-  enabled: boolean;
-  createdAt: Date;
-}
-
-export interface AutomationTrigger {
-  type: 'task_created' | 'task_completed' | 'due_date_approaching' | 'status_changed' | 'time_tracked';
-  parameters?: Record<string, any>;
-}
-
-export interface AutomationCondition {
-  field: string;
-  operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
-  value: any;
-}
-
-export interface AutomationAction {
-  type: 'set_priority' | 'assign_to' | 'add_tag' | 'send_notification' | 'create_subtask' | 'move_to_list';
-  parameters: Record<string, any>;
 }
 
 export interface Comment {
@@ -147,9 +109,6 @@ export interface TodoList {
   permissions?: ListPermissions;
   workflow?: WorkflowStage[];
   customFields?: CustomFieldDefinition[];
-  automationRules?: AutomationRule[];
-  integrations?: Integration[];
-  aiInsights?: AIInsight[];
   templates?: TaskTemplate[];
   milestones?: Milestone[];
   sprints?: Sprint[];
@@ -163,7 +122,6 @@ export interface WorkflowStage {
   color: string;
   order: number;
   isCompleted?: boolean;
-  automationRules?: AutomationRule[];
 }
 
 export interface CustomFieldDefinition {
@@ -173,27 +131,6 @@ export interface CustomFieldDefinition {
   options?: string[];
   required?: boolean;
   defaultValue?: any;
-}
-
-export interface Integration {
-  id: string;
-  type: 'slack' | 'discord' | 'email' | 'calendar' | 'github' | 'jira' | 'trello' | 'notion';
-  name: string;
-  config: Record<string, any>;
-  enabled: boolean;
-  lastSync?: Date;
-}
-
-export interface AIInsight {
-  id: string;
-  type: 'productivity_trend' | 'bottleneck_detection' | 'workload_balance' | 'deadline_risk' | 'optimization';
-  title: string;
-  description: string;
-  severity: 'info' | 'warning' | 'critical';
-  actionable: boolean;
-  suggestions: string[];
-  createdAt: Date;
-  dismissed?: boolean;
 }
 
 export interface Milestone {
@@ -318,7 +255,6 @@ export interface TaskTemplate {
   isPublic?: boolean;
   usageCount?: number;
   customFields?: CustomField[];
-  automationRules?: AutomationRule[];
   dependencies?: Omit<TaskDependency, 'id'>[];
 }
 
@@ -362,7 +298,6 @@ export interface AppSettings {
   productivity: ProductivitySettings;
   ai: AISettings;
   security: SecuritySettings;
-  integrations: IntegrationSettings;
   collaboration: CollaborationSettings;
 }
 
@@ -398,14 +333,6 @@ export interface PasswordPolicy {
   expirationDays: number;
 }
 
-export interface IntegrationSettings {
-  allowedIntegrations: string[];
-  webhookUrl?: string;
-  apiRateLimit: number;
-  syncFrequency: number; // minutes
-  dataMapping: Record<string, string>;
-}
-
 export interface CollaborationSettings {
   allowGuestUsers: boolean;
   defaultPermissions: UserPermissions;
@@ -432,11 +359,6 @@ export interface NotificationSettings {
 }
 
 export interface ProductivitySettings {
-  pomodoroEnabled: boolean;
-  pomodoroLength: number;
-  shortBreak: number;
-  longBreak: number;
-  autoStartBreaks: boolean;
   focusMode: boolean;
   timeBlocking: boolean;
   deepWorkSessions: boolean;
@@ -556,8 +478,6 @@ export interface ExportData {
   exportedAt: Date;
   version: string;
   customFields: CustomFieldDefinition[];
-  automationRules: AutomationRule[];
-  integrations: Integration[];
   workflows: WorkflowStage[];
 }
 

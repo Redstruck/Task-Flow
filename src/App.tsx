@@ -24,14 +24,13 @@ import BulkActions from './components/BulkActions';
 import Analytics from './components/Analytics';
 import Settings from './components/Settings';
 import Collaboration from './components/Collaboration';
-import EnterpriseIntegrations from './components/EnterpriseIntegrations';
 import RealTimeCollaboration from './components/RealTimeCollaboration';
 import CalendarView from './components/CalendarView';
 import DragPreview from './components/DragPreview';
 import { MobileNavigation, useMobileOptimization } from './components/MobileOptimization';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { TodoList, Task, TaskTemplate, SearchFilters, AppSettings, Collaborator, Integration } from './types';
+import { TodoList, Task, TaskTemplate, SearchFilters, AppSettings, Collaborator } from './types';
 import { createTask, createDefaultList, createList, createTemplate, createTaskFromTemplate, duplicateTask } from './utils/taskUtils';
 import { filterTasks, getAllTags } from './utils/searchUtils';
 import { exportData, importData, clearAllData, generateCSVReport } from './utils/exportUtils';
@@ -66,11 +65,6 @@ const defaultSettings: AppSettings = {
   timeFormat: '12h',
   weekStart: 'monday',
   productivity: {
-    pomodoroEnabled: false,
-    pomodoroLength: 25,
-    shortBreak: 5,
-    longBreak: 15,
-    autoStartBreaks: false,
     focusMode: false,
     timeBlocking: false,
     deepWorkSessions: false,
@@ -111,12 +105,6 @@ const defaultSettings: AppSettings = {
     ssoEnabled: false,
     backupEncryption: true,
   },
-  integrations: {
-    allowedIntegrations: ['slack', 'discord', 'email', 'calendar', 'github'],
-    apiRateLimit: 1000,
-    syncFrequency: 15,
-    dataMapping: {},
-  },
   collaboration: {
     allowGuestUsers: true,
     defaultPermissions: {
@@ -139,7 +127,6 @@ const defaultSettings: AppSettings = {
 function App() {
   const [lists, setLists] = useLocalStorage<TodoList[]>('todo-lists', [createDefaultList()]);
   const [templates, setTemplates] = useLocalStorage<TaskTemplate[]>('task-templates', []);
-  const [integrations, setIntegrations] = useLocalStorage<Integration[]>('integrations', []);
   const [settings, setSettings] = useLocalStorage<AppSettings>('app-settings', defaultSettings);
   const [showListCreator, setShowListCreator] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -147,7 +134,6 @@ function App() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showCollaboration, setShowCollaboration] = useState<string | null>(null);
-  const [showIntegrations, setShowIntegrations] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeList, setActiveList] = useState<TodoList | null>(null);
@@ -289,7 +275,6 @@ function App() {
       setShowAnalytics(false);
       setShowSettings(false);
       setShowCollaboration(null);
-      setShowIntegrations(false);
       setShowCalendar(false);
       setSelectedTasks([]);
     },
@@ -565,59 +550,6 @@ function App() {
     setTemplates(prev => prev.filter(template => template.id !== templateId));
   };
 
-  // Integrations
-  const handleToggleIntegration = (integrationId: string, enabled: boolean) => {
-    setIntegrations(prev =>
-      prev.map(integration =>
-        integration.id === integrationId ? { ...integration, enabled } : integration
-      )
-    );
-  };
-
-  const handleConfigureIntegration = (integrationId: string, config: Record<string, any>) => {
-    setIntegrations(prev => {
-      const existing = prev.find(i => i.id === integrationId);
-      if (existing) {
-        return prev.map(integration =>
-          integration.id === integrationId ? { ...integration, config } : integration
-        );
-      } else {
-        // Create new integration
-        const newIntegration: Integration = {
-          id: Date.now().toString(),
-          type: 'slack', // This would be determined by the integration type
-          name: 'New Integration',
-          config,
-          enabled: false,
-        };
-        return [...prev, newIntegration];
-      }
-    });
-  };
-
-  const handleSyncIntegration = (integrationId: string) => {
-    setIntegrations(prev =>
-      prev.map(integration =>
-        integration.id === integrationId 
-          ? { ...integration, lastSync: new Date() }
-          : integration
-      )
-    );
-  };
-
-  // Real-time collaboration
-  const handleSendMessage = (message: string) => {
-    console.log('Sending message:', message);
-  };
-
-  const handleStartCall = (type: 'video' | 'audio') => {
-    console.log('Starting call:', type);
-  };
-
-  const handleShareScreen = () => {
-    console.log('Sharing screen');
-  };
-
   // Bulk actions
   const handleTaskSelect = (taskId: string, selected: boolean) => {
     setSelectedTasks(prev => 
@@ -809,7 +741,6 @@ function App() {
           onShowTemplates={() => setShowTemplates(true)}
           onShowShortcuts={() => setShowShortcuts(true)}
           onShowAnalytics={() => setShowAnalytics(true)}
-          onShowIntegrations={() => setShowIntegrations(true)}
           onShowCalendar={() => setShowCalendar(true)}
           onShowSettings={() => setShowSettings(true)}
         />
@@ -934,9 +865,9 @@ function App() {
           <RealTimeCollaboration
             collaborators={sampleCollaborators}
             currentUser="current-user"
-            onSendMessage={handleSendMessage}
-            onStartCall={handleStartCall}
-            onShareScreen={handleShareScreen}
+            onSendMessage={() => {}}
+            onStartCall={() => {}}
+            onShareScreen={() => {}}
             isConnected={true}
           />
         )}
@@ -970,15 +901,6 @@ function App() {
           onClearData={handleClearData}
           isOpen={showSettings}
           onClose={() => setShowSettings(false)}
-        />
-
-        <EnterpriseIntegrations
-          integrations={integrations}
-          onToggleIntegration={handleToggleIntegration}
-          onConfigureIntegration={handleConfigureIntegration}
-          onSyncIntegration={handleSyncIntegration}
-          isOpen={showIntegrations}
-          onClose={() => setShowIntegrations(false)}
         />
 
         <CalendarView
