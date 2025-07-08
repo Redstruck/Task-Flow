@@ -4,10 +4,10 @@ import { Task } from '../types';
 
 interface AddTaskInputProps {
   onAddTask: (title: string, priority: Task['priority'], dueDate?: Date) => void;
-  defaultPriority?: Task['priority'];
+  defaultPriority: Task['priority'];
 }
 
-const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority = 'medium' }) => {
+const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority }) => {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Task['priority']>(defaultPriority);
   const [dueDate, setDueDate] = useState('');
@@ -22,11 +22,10 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
     e.preventDefault();
     if (title.trim()) {
       const dueDateObj = dueDate ? new Date(dueDate) : undefined;
-      // Always pass the current priority state, not defaultPriority
       onAddTask(title.trim(), priority, dueDateObj);
       setTitle('');
       setDueDate('');
-      setPriority(defaultPriority); // Reset to default priority after creating task
+      setPriority(defaultPriority); // Reset to current default priority after creating task
       setShowOptions(false);
     }
   };

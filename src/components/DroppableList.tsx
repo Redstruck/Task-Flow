@@ -21,7 +21,7 @@ interface DroppableListProps {
   onSelectTask: (taskId: string, selected: boolean) => void;
   selectedTasks: string[];
   onShowCollaboration?: () => void;
-  defaultPriority?: Task['priority']; // Add this prop
+  defaultPriority: Task['priority'];
 }
 
 const DroppableList: React.FC<DroppableListProps> = ({
@@ -37,7 +37,7 @@ const DroppableList: React.FC<DroppableListProps> = ({
   onSelectTask,
   selectedTasks,
   onShowCollaboration,
-  defaultPriority = 'medium', // Default fallback
+  defaultPriority,
 }) => {
   const [dragOverState, setDragOverState] = useState<{
     isOver: boolean;
