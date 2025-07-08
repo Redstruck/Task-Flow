@@ -2,7 +2,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-import { TodoList } from '../types';
+import { TodoList, Task } from '../types';
 import DroppableList from './DroppableList';
 
 interface DraggableListProps {
@@ -18,6 +18,8 @@ interface DraggableListProps {
   onDuplicateTask: (listId: string, taskId: string) => void;
   onSelectTask: (taskId: string, selected: boolean) => void;
   selectedTasks: string[];
+  onShowCollaboration: () => void;
+  defaultPriority: Task['priority'];
 }
 
 const DraggableList: React.FC<DraggableListProps> = ({
@@ -33,6 +35,8 @@ const DraggableList: React.FC<DraggableListProps> = ({
   onDuplicateTask,
   onSelectTask,
   selectedTasks,
+  onShowCollaboration,
+  defaultPriority,
 }) => {
   const {
     attributes,
