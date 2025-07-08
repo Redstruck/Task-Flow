@@ -780,6 +780,7 @@ function App() {
                     selectedTasks={selectedTasks}
                     onShowCollaboration={() => setShowCollaboration(list.id)}
                     defaultPriority={settings.defaultPriority}
+                    defaultPriority={settings.defaultPriority}
                   />
                 ))}
                 

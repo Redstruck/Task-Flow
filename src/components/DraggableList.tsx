@@ -19,6 +19,7 @@ interface DraggableListProps {
   onSelectTask: (taskId: string, selected: boolean) => void;
   selectedTasks: string[];
   onShowCollaboration?: () => void;
+  defaultPriority: Task['priority'];
 }
 
 const DraggableList: React.FC<DraggableListProps> = ({
@@ -35,6 +36,7 @@ const DraggableList: React.FC<DraggableListProps> = ({
   onSelectTask,
   selectedTasks,
   onShowCollaboration,
+  defaultPriority,
 }) => {
   const {
     attributes,
@@ -114,6 +116,7 @@ const DraggableList: React.FC<DraggableListProps> = ({
       {/* Drag Ghost Effect */}
       {isDragging && (
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl pointer-events-none" />
+        defaultPriority={defaultPriority}
       )}
     </div>
   );
