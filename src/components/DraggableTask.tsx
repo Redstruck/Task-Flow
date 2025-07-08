@@ -8,6 +8,8 @@ import { DropIndicator, TaskPlaceholder } from './DragPreview';
 
 interface DraggableTaskProps {
   task: Task;
+  listId: string;
+  index: number;
   onToggleComplete: (taskId: string) => void;
   onDelete: (taskId: string) => void;
   onUpdate: (taskId: string, updates: Partial<Task>) => void;
@@ -19,6 +21,8 @@ interface DraggableTaskProps {
 
 const DraggableTask: React.FC<DraggableTaskProps> = ({
   task,
+  listId,
+  index,
   onToggleComplete,
   onDelete,
   onUpdate,
