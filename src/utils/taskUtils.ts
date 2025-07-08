@@ -110,11 +110,6 @@ export const sortTasks = (tasks: Task[], sortMethod: SortMethod): Task[] => {
         return 0;
       });
       
-    case 'chronological':
-      return activeTasks.sort((a, b) => 
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-      
     case 'manual':
     default:
       return activeTasks;

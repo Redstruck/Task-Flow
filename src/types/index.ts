@@ -101,7 +101,7 @@ export interface TodoList {
   description?: string;
   color: string;
   tasks: Task[];
-  sortMethod: 'smart' | 'priority' | 'dueDate' | 'chronological' | 'manual' | 'kanban';
+  sortMethod: 'smart' | 'priority' | 'dueDate' | 'manual';
   createdAt: Date;
   archived?: boolean;
   shared?: boolean;
@@ -536,7 +536,6 @@ export interface AuditLog {
   userAgent: string;
 }
 
-export type SortMethod = TodoList['sortMethod'];
 
 export interface DragEndEvent {
   active: {

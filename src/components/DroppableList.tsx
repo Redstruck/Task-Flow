@@ -107,9 +107,7 @@ const DroppableList: React.FC<DroppableListProps> = ({
     smart: 'Smart Sort',
     priority: 'Priority',
     dueDate: 'Due Date',
-    chronological: 'Created',
     manual: 'Manual',
-    kanban: 'Kanban',
   };
 
   // Check if dragging from different list

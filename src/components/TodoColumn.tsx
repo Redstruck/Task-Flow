@@ -29,7 +29,6 @@ const TodoColumn: React.FC<TodoColumnProps> = ({
     smart: 'Smart Sort',
     priority: 'Priority',
     dueDate: 'Due Date',
-    chronological: 'Created',
     manual: 'Manual',
   };
 
