@@ -99,11 +99,6 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
                   </button>
                 ))}
               </div>
-              {priority !== defaultPriority && (
-                <p className="text-xs text-blue-600 mt-2">
-                  Using {priorityLabels[priority]} priority (default: {priorityLabels[defaultPriority]})
-                </p>
-              )}
             </div>
 
             <div>
