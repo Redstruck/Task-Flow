@@ -22,6 +22,8 @@ interface DroppableListProps {
   selectedTasks: string[];
   onShowCollaboration?: () => void;
   defaultPriority: Task['priority'];
+}
+
 const DroppableList: React.FC<DroppableListProps> = ({
   list,
   totalLists,
@@ -36,6 +38,8 @@ const DroppableList: React.FC<DroppableListProps> = ({
   selectedTasks,
   onShowCollaboration,
   defaultPriority,
+}) => {
+  const [dragOverState, setDragOverState] = useState<{
     isOver: boolean;
     activeTask: Task | null;
   }>({
