@@ -138,7 +138,6 @@ function App() {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeList, setActiveList] = useState<TodoList | null>(null);
   const [activeListId, setActiveListId] = useState<string | null>(null);
-  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     query: '',
     priority: undefined,
@@ -750,14 +749,6 @@ function App() {
                     onUpdateList={handleUpdateList}
                     onDeleteList={handleDeleteList}
                     onDuplicateTask={handleDuplicateTask}
-                    onSelectTask={(taskId: string, selected: boolean) => {
-                      setSelectedTasks(prev => 
-                        selected 
-                          ? [...prev, taskId]
-                          : prev.filter(id => id !== taskId)
-                      );
-                    }}
-                    selectedTasks={selectedTasks}
                     onShowCollaboration={() => setShowCollaboration(list.id)}
                     defaultPriority={settings.defaultPriority}
                   />

@@ -18,8 +18,6 @@ interface DroppableListProps {
   onUpdateList: (listId: string, updates: Partial<TodoList>) => void;
   onDeleteList: (listId: string) => void;
   onDuplicateTask: (listId: string, taskId: string) => void;
-  onSelectTask: (taskId: string, selected: boolean) => void;
-  selectedTasks: string[];
   onShowCollaboration?: () => void;
   defaultPriority: Task['priority'];
 }
@@ -34,8 +32,6 @@ const DroppableList: React.FC<DroppableListProps> = ({
   onUpdateList,
   onDeleteList,
   onDuplicateTask,
-  onSelectTask,
-  selectedTasks,
   onShowCollaboration,
   defaultPriority,
 }) => {
@@ -296,8 +292,6 @@ const DroppableList: React.FC<DroppableListProps> = ({
                       onDelete={(taskId) => onDeleteTask(list.id, taskId)}
                       onUpdate={(taskId, updates) => onUpdateTask(list.id, taskId, updates)}
                       onDuplicate={(taskId) => onDuplicateTask(list.id, taskId)}
-                      onSelect={onSelectTask}
-                      isSelected={selectedTasks.includes(task.id)}
                     />
                   </div>
                 ))}
@@ -334,8 +328,6 @@ const DroppableList: React.FC<DroppableListProps> = ({
                       onDelete={(taskId) => onDeleteTask(list.id, taskId)}
                       onUpdate={(taskId, updates) => onUpdateTask(list.id, taskId, updates)}
                       onDuplicate={(taskId) => onDuplicateTask(list.id, taskId)}
-                      onSelect={onSelectTask}
-                      isSelected={selectedTasks.includes(task.id)}
                     />
                   </div>
                 ))}
