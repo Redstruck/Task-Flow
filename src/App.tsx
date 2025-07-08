@@ -137,7 +137,6 @@ function App() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeList, setActiveList] = useState<TodoList | null>(null);
-  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [activeListId, setActiveListId] = useState<string | null>(null);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     query: '',
@@ -264,8 +263,7 @@ function App() {
     },
     onShowShortcuts: () => setShowShortcuts(true),
     onSelectAll: () => {
-      const allTaskIds = allTasks.map(task => task.id);
-      setSelectedTasks(allTaskIds);
+      // Select all functionality can be implemented later if needed
     },
     onMarkAllComplete: () => handleBulkComplete(),
     onEscape: () => {
@@ -276,7 +274,6 @@ function App() {
       setShowSettings(false);
       setShowCollaboration(null);
       setShowCalendar(false);
-      setSelectedTasks([]);
     },
   });
 
@@ -551,52 +548,28 @@ function App() {
   };
 
   // Bulk actions
-  const handleTaskSelect = (taskId: string, selected: boolean) => {
-    setSelectedTasks(prev => 
-      selected 
-        ? [...prev, taskId]
-        : prev.filter(id => id !== taskId)
-    );
-  };
-
   const handleBulkComplete = () => {
-    setLists(prevLists =>
-      prevLists.map(list => ({
-        ...list,
-        tasks: list.tasks.map(task =>
-          selectedTasks.includes(task.id)
-            ? { ...task, completed: true, completedAt: new Date(), updatedAt: new Date() }
-            : task
-        ),
-      }))
-    );
-    setSelectedTasks([]);
+    // Bulk complete functionality can be implemented later if needed
   };
 
   const handleBulkDelete = () => {
-    setLists(prevLists =>
-      prevLists.map(list => ({
-        ...list,
-        tasks: list.tasks.filter(task => !selectedTasks.includes(task.id)),
-      }))
-    );
-    setSelectedTasks([]);
+    // Bulk delete functionality can be implemented later if needed
   };
 
   const handleBulkArchive = () => {
-    setSelectedTasks([]);
+    // Bulk archive functionality can be implemented later if needed
   };
 
   const handleBulkTag = () => {
-    setSelectedTasks([]);
+    // Bulk tag functionality can be implemented later if needed
   };
 
   const handleBulkAssign = () => {
-    setSelectedTasks([]);
+    // Bulk assign functionality can be implemented later if needed
   };
 
   const handleBulkSetDueDate = () => {
-    setSelectedTasks([]);
+    // Bulk set due date functionality can be implemented later if needed
   };
 
   // Collaboration
@@ -776,10 +749,7 @@ function App() {
                     onUpdateList={handleUpdateList}
                     onDeleteList={handleDeleteList}
                     onDuplicateTask={handleDuplicateTask}
-                    onSelectTask={handleTaskSelect}
-                    selectedTasks={selectedTasks}
                     onShowCollaboration={() => setShowCollaboration(list.id)}
-                    defaultPriority={settings.defaultPriority}
                     defaultPriority={settings.defaultPriority}
                   />
                 ))}
@@ -850,16 +820,6 @@ function App() {
         </DragPreview>
 
         {/* Bulk Actions */}
-        <BulkActions
-          selectedTasks={selectedTasks}
-          onBulkComplete={handleBulkComplete}
-          onBulkDelete={handleBulkDelete}
-          onBulkArchive={handleBulkArchive}
-          onBulkTag={handleBulkTag}
-          onBulkAssign={handleBulkAssign}
-          onBulkSetDueDate={handleBulkSetDueDate}
-          onClearSelection={() => setSelectedTasks([])}
-        />
 
         {/* Real-time Collaboration */}
         {!isMobile && sampleCollaborators.length > 0 && settings.collaboration.realTimeUpdates && (

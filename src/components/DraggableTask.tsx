@@ -14,8 +14,6 @@ interface DraggableTaskProps {
   onDuplicate: (taskId: string) => void;
   onSelect: (taskId: string, selected: boolean) => void;
   isSelected: boolean;
-  listId: string;
-  index: number;
   totalTasks: number;
 }
 
@@ -27,8 +25,6 @@ const DraggableTask: React.FC<DraggableTaskProps> = ({
   onDuplicate,
   onSelect,
   isSelected,
-  listId,
-  index,
   totalTasks,
 }) => {
   const [showDropIndicator, setShowDropIndicator] = useState<'top' | 'bottom' | null>(null);

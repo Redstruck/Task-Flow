@@ -18,8 +18,6 @@ interface DraggableListProps {
   onDuplicateTask: (listId: string, taskId: string) => void;
   onSelectTask: (taskId: string, selected: boolean) => void;
   selectedTasks: string[];
-  onShowCollaboration?: () => void;
-  defaultPriority: Task['priority'];
 }
 
 const DraggableList: React.FC<DraggableListProps> = ({
@@ -35,8 +33,6 @@ const DraggableList: React.FC<DraggableListProps> = ({
   onDuplicateTask,
   onSelectTask,
   selectedTasks,
-  onShowCollaboration,
-  defaultPriority,
 }) => {
   const {
     attributes,
