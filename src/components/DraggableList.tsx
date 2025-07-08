@@ -110,13 +110,13 @@ const DraggableList: React.FC<DraggableListProps> = ({
           onSelectTask={onSelectTask}
           selectedTasks={selectedTasks}
           onShowCollaboration={onShowCollaboration}
+          defaultPriority={defaultPriority}
         />
       </div>
 
       {/* Drag Ghost Effect */}
       {isDragging && (
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl pointer-events-none" />
-        defaultPriority={defaultPriority}
       )}
     </div>
   );
