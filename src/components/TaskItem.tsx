@@ -10,8 +10,6 @@ interface TaskItemProps {
   onDelete: (taskId: string) => void;
   onUpdate: (taskId: string, updates: Partial<Task>) => void;
   onDuplicate?: (taskId: string) => void;
-  onSelect?: (taskId: string, selected: boolean) => void;
-  isSelected?: boolean;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ 
@@ -20,8 +18,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onDelete, 
   onUpdate, 
   onDuplicate,
-  onSelect,
-  isSelected = false
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
@@ -95,19 +91,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
   return (
     <div className={`group flex flex-col p-4 bg-white/60 backdrop-blur-sm rounded-xl border shadow-md hover:shadow-lg transition-all duration-200 hover:bg-white/80 hover-lift-subtle ${
       task.completed ? 'opacity-60' : ''
-    } ${isOverdue ? 'border-red-200 bg-red-50/50' : 'border-gray-200/50'} ${
-      isSelected ? 'ring-2 ring-blue-500 border-blue-300' : ''
-    }`}>
+    } ${isOverdue ? 'border-red-200 bg-red-50/50' : 'border-gray-200/50'}`}>
       <div className="flex items-start space-x-3">
-        {onSelect && (
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={(e) => onSelect(task.id, e.target.checked)}
-            className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition-all duration-200"
-          />
-        )}
-        
         <button
           onClick={() => onToggleComplete(task.id)}
           className={`flex-shrink-0 w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-200 mt-0.5 hover:shadow-md btn-animate ${

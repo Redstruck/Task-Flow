@@ -14,8 +14,6 @@ interface DraggableTaskProps {
   onDelete: (taskId: string) => void;
   onUpdate: (taskId: string, updates: Partial<Task>) => void;
   onDuplicate: (taskId: string) => void;
-  onSelect: (taskId: string, selected: boolean) => void;
-  isSelected: boolean;
   totalTasks: number;
 }
 
@@ -27,8 +25,6 @@ const DraggableTask: React.FC<DraggableTaskProps> = ({
   onDelete,
   onUpdate,
   onDuplicate,
-  onSelect,
-  isSelected,
   totalTasks,
 }) => {
   const [showDropIndicator, setShowDropIndicator] = useState<'top' | 'bottom' | null>(null);
@@ -108,8 +104,6 @@ const DraggableTask: React.FC<DraggableTaskProps> = ({
           onDelete={onDelete}
           onUpdate={onUpdate}
           onDuplicate={onDuplicate}
-          onSelect={onSelect}
-          isSelected={isSelected}
         />
       </div>
     </div>
