@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, X, Calendar, AlertCircle, Edit3, Clock, Tag, Copy } from 'lucide-react';
 import { Task } from '../types';
 import { getPriorityColor, formatDueDate } from '../utils/taskUtils';
@@ -22,6 +22,30 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  const handleToggleComplete = () => {
+    if (!task.completed) {
+      // Starting completion animation
+      setIsCompleting(true);
+      setShowCelebration(true);
+      
+      // Complete the task after animation starts
+      setTimeout(() => {
+        onToggleComplete(task.id);
+      }, 200);
+      
+      // Hide celebration after animation
+      setTimeout(() => {
+        setShowCelebration(false);
+        setIsCompleting(false);
+      }, 1500);
+    } else {
+      // Uncompleting - no animation needed
+      onToggleComplete(task.id);
+    }
+  };
 
   const handleSave = () => {
     if (editTitle.trim()) {
@@ -89,16 +113,73 @@ const TaskItem: React.FC<TaskItemProps> = ({
   }
 
   return (
-    <div className={`group flex flex-col p-4 bg-white/60 backdrop-blur-sm rounded-xl border shadow-md hover:shadow-lg transition-all duration-200 hover:bg-white/80 hover-lift-subtle ${
-      task.completed ? 'opacity-60' : ''
-    } ${isOverdue ? 'border-red-200 bg-red-50/50' : 'border-gray-200/50'}`}>
+    <div className={`group flex flex-col p-4 bg-white/60 backdrop-blur-sm rounded-xl border shadow-md hover:shadow-lg transition-all duration-500 hover:bg-white/80 hover-lift-subtle relative overflow-hidden ${
+      task.completed ? 'opacity-60 scale-95' : ''
+    } ${isOverdue ? 'border-red-200 bg-red-50/50' : 'border-gray-200/50'} ${
+      isCompleting ? 'animate-pulse scale-105' : ''
+    }`}>
+      
+      {/* Celebration Animation */}
+      {showCelebration && (
+        <>
+          {/* Confetti particles */}
+          <div className="absolute inset-0 pointer-events-none z-10">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className={`absolute w-2 h-2 rounded-full animate-bounce ${
+                  ['bg-yellow-400', 'bg-green-400', 'bg-blue-400', 'bg-purple-400', 'bg-pink-400', 'bg-red-400'][i % 6]
+                }`}
+                style={{
+                  left: `${20 + (i * 8)}%`,
+                  top: `${30 + (i % 3) * 20}%`,
+                  animationDelay: `${i * 50}ms`,
+                  animationDuration: '800ms',
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Success ripple effect */}
+          <div className="absolute inset-0 bg-green-400/20 rounded-xl animate-ping pointer-events-none z-5" />
+          
+          {/* Checkmark burst */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center animate-bounce shadow-2xl">
+              <Check className="w-8 h-8 text-white animate-pulse" />
+            </div>
+          </div>
+        </>
+      )}
+
       <div className="flex items-start space-x-3">
         <button
-          onClick={() => onToggleComplete(task.id)}
-          className={`flex-shrink-0 w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-200 mt-0.5 hover:shadow-md btn-animate ${
+          onClick={handleToggleComplete}
+          className={`flex-shrink-0 w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 mt-0.5 hover:shadow-md btn-animate transform hover:scale-110 ${
             task.completed
-              ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-md'
-              : 'border-gray-300 hover:border-green-400 hover:bg-green-50'
+              ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/30 animate-pulse'
+              : 'border-gray-300 hover:border-green-400 hover:bg-green-50 hover:shadow-green-200'
+          } ${isCompleting ? 'animate-spin' : ''}`}
+        >
+          {task.completed && <Check className={`w-3 h-3 ${isCompleting ? 'animate-bounce' : ''}`} />}
+        </button>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <h3 className={`text-sm font-medium transition-all duration-500 break-words ${
+                task.completed ? 'line-through text-gray-500 transform scale-95' : 'text-gray-900'
+              } ${isCompleting ? 'animate-pulse' : ''}`}>
+                {task.title}
+              </h3>
+              {task.description && (
+                <p className={`text-xs mt-1 transition-all duration-500 break-words whitespace-pre-wrap ${
+                  task.completed ? 'line-through text-gray-400 transform scale-95' : 'text-gray-600'
+                } ${isCompleting ? 'animate-pulse' : ''}`}>
+                  {task.description}
+                </p>
+              )}
+            </div>
           }`}
         >
           {task.completed && <Check className="w-3 h-3" />}
