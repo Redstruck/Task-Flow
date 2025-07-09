@@ -180,29 +180,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 </p>
               )}
             </div>
-          }`}
-        >
-          {task.completed && <Check className="w-3 h-3" />}
-        </button>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between">
-            <div className="flex-1 min-w-0">
-              <h3 className={`text-sm font-medium transition-all duration-200 break-words ${
-                task.completed ? 'line-through text-gray-500' : 'text-gray-900'
-              }`}>
-                {task.title}
-              </h3>
-              {task.description && (
-                <p className={`text-xs mt-1 transition-all duration-200 break-words whitespace-pre-wrap ${
-                  task.completed ? 'line-through text-gray-400' : 'text-gray-600'
-                }`}>
-                  {task.description}
-                </p>
-              )}
-            </div>
             
-            <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200 ml-2 flex-shrink-0">
+            <div className="flex items-ce\nter \space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200 ml-2 flex-shrink-0">
               {onDuplicate && (
                 <button
                   onClick={() => onDuplicate(task.id)}
@@ -231,12 +210,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
           
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center space-x-2 flex-wrap">
-              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-all duration-200 ${getPriorityColor(task.priority)}`}>
+              <span className={\`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-all duration-200 ${getPriorityColor(task.priority)}`}>
                 {task.priority}
               </span>
               
               {task.dueDate && (
-                <div className={`flex items-center space-x-1 text-xs px-2 py-1 rounded-full transition-all duration-200 ${
+                <div className={\`flex items-center space-x-1 text-xs px-2 py-1 rounded-full transition-all duration-200 ${
                   isOverdue ? 'text-red-600 bg-red-100' : 'text-gray-500 bg-gray-100'
                 }`}>
                   {isOverdue ? <AlertCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
@@ -274,12 +253,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
             <div className="mt-3 space-y-1">
               {task.subtasks.slice(0, 3).map((subtask) => (
                 <div key={subtask.id} className="flex items-center space-x-2 text-xs">
-                  <div className={`w-3 h-3 rounded border transition-all duration-200 ${
+                  <div className={\`w-3 h-3 rounded border transition-all duration-200 ${
                     subtask.completed ? 'bg-green-500 border-green-500' : 'border-gray-300'
                   }`}>
                     {subtask.completed && <Check className="w-2 h-2 text-white" />}
                   </div>
-                  <span className={`transition-all duration-200 break-words ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                  <span className={\`transition-all duration-200 break-words ${subtask.completed ? 'line-through text-gray-400' : 'text-gray-600'}`}>
                     {subtask.title}
                   </span>
                 </div>
