@@ -749,7 +749,6 @@ function App() {
                     onUpdateList={handleUpdateList}
                     onDeleteList={handleDeleteList}
                     onDuplicateTask={handleDuplicateTask}
-                    onShowCollaboration={() => setShowCollaboration(list.id)}
                     defaultPriority={settings.defaultPriority}
                   />
                 ))}

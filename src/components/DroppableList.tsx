@@ -6,7 +6,7 @@ import { sortTasks, getListColor } from '../utils/taskUtils';
 import DraggableTask from './DraggableTask';
 import AddTaskInput from './AddTaskInput';
 import { TaskPlaceholder } from './DragPreview';
-import { MoreVertical, ArrowUpDown, Trash2, CheckSquare, Users, Share2 } from 'lucide-react';
+import { MoreVertical, ArrowUpDown, Trash2, CheckSquare, Share2 } from 'lucide-react';
 
 interface DroppableListProps {
   list: TodoList;
@@ -18,7 +18,6 @@ interface DroppableListProps {
   onUpdateList: (listId: string, updates: Partial<TodoList>) => void;
   onDeleteList: (listId: string) => void;
   onDuplicateTask: (listId: string, taskId: string) => void;
-  onShowCollaboration?: () => void;
   defaultPriority: Task['priority'];
 }
 
@@ -32,7 +31,6 @@ const DroppableList: React.FC<DroppableListProps> = ({
   onUpdateList,
   onDeleteList,
   onDuplicateTask,
-  onShowCollaboration,
   defaultPriority,
 }) => {
   const [dragOverState, setDragOverState] = useState<{
@@ -137,14 +135,6 @@ const DroppableList: React.FC<DroppableListProps> = ({
               {list.shared && (
                 <Share2 className="w-4 h-4 text-blue-500" title="Shared list" />
               )}
-              {list.collaborators && list.collaborators.length > 0 && (
-                <div className="flex items-center space-x-1">
-                  <Users className="w-4 h-4 text-purple-500" />
-                  <span className="text-xs text-purple-600 font-medium">
-                    {list.collaborators.length}
-                  </span>
-                </div>
-              )}
             </div>
             {list.description && (
               <p className="text-xs text-gray-500 ml-5">{list.description}</p>
@@ -152,17 +142,6 @@ const DroppableList: React.FC<DroppableListProps> = ({
           </div>
           
           <div className="flex items-center space-x-1">
-            {/* Collaboration Button */}
-            {onShowCollaboration && (
-              <button 
-                onClick={onShowCollaboration}
-                className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200"
-                title="Manage collaboration"
-              >
-                <Users className="w-4 h-4" />
-              </button>
-            )}
-
             {/* Sort Menu */}
             <div className="relative" ref={sortMenuRef}>
               <button 
