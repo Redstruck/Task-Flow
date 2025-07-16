@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center space-x-1">
           <button 
             onClick={onShowAnalytics}
-            className="group relative p-3 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200 hover:shadow-md"
+            className="group relative p-3 text-gray-600 hover:text-purple-600 hover:bg-purple-50 hover:shadow-purple-200/50 rounded-xl transition-all duration-200 hover:shadow-md"
             title="Analytics"
           >
             <BarChart3 className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -59,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({
           
           <button 
             onClick={onShowTemplates}
-            className="group relative p-3 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-200 hover:shadow-md"
+            className="group relative p-3 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 hover:shadow-indigo-200/50 rounded-xl transition-all duration-200 hover:shadow-md"
             title="Templates"
           >
             <Template className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({
           
           <button 
             onClick={onShowShortcuts}
-            className="group relative p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:shadow-md"
+            className="group relative p-3 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 hover:shadow-emerald-200/50 rounded-xl transition-all duration-200 hover:shadow-md"
             title="Keyboard Shortcuts"
           >
             <Keyboard className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -75,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({
           
           <button 
             onClick={onShowCalendar}
-            className="group p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:shadow-md"
+            className="group p-3 text-gray-600 hover:text-orange-600 hover:bg-orange-50 hover:shadow-orange-200/50 rounded-xl transition-all duration-200 hover:shadow-md"
             title="Calendar View"
           >
             <Calendar className="w-5 h-5 transition-transform group-hover:scale-110" />
@@ -83,7 +83,7 @@ const Header: React.FC<HeaderProps> = ({
           
           <button 
             onClick={onShowSettings}
-            className="group p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200 hover:shadow-md"
+            className="group p-3 text-gray-600 hover:text-slate-600 hover:bg-slate-50 hover:shadow-slate-200/50 rounded-xl transition-all duration-200 hover:shadow-md"
             title="Settings"
           >
             <Settings className="w-5 h-5 transition-transform group-hover:scale-110" />
