@@ -1,18 +1,26 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-HX28PBW6RD"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Google Analytics (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HX28PBW6RD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-HX28PBW6RD');
+    </script>
 
-  gtag('config', 'G-HX28PBW6RD');
-</script>
-    <meta charset="UTF-8" />
+    <!-- Performance Optimizations -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
     
-    <!-- Favicon and App Icons -->
+    <!-- Meta and Basic Setup -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="description" content="TaskFlux - Advanced Task Management Application for enhanced productivity" />
+    
+    <!-- App Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -20,32 +28,31 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    
-    <!-- Meta tags for better app experience -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#3b82f6" />
-    <meta name="description" content="TaskFlow - Advanced Task Management Application for enhanced productivity" />
+
+    <!-- PWA / iOS Support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="TaskFlow" />
-    
-    <!-- Open Graph / Social Media -->
+    <meta name="apple-mobile-web-app-title" content="TaskFlux" />
+
+    <!-- Open Graph / Social Sharing -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="TaskFlow - Advanced Task Management" />
-    <meta property="og:description" content="Streamline your productivity with TaskFlow's advanced task management features" />
+    <meta property="og:title" content="TaskFlux - Advanced Task Management" />
+    <meta property="og:description" content="Streamline your productivity with TaskFlux's advanced task management features." />
     <meta property="og:image" content="/android-chrome-512x512.png" />
-    
+    <meta property="og:url" content="https://yourdomain.com" />
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="TaskFlow - Advanced Task Management" />
-    <meta name="twitter:description" content="Streamline your productivity with TaskFlow's advanced task management features" />
+    <meta name="twitter:title" content="TaskFlux - Advanced Task Management" />
+    <meta name="twitter:description" content="Streamline your productivity with TaskFlux's advanced task management features." />
     <meta name="twitter:image" content="/android-chrome-512x512.png" />
-    
+
+    <!-- Page Title -->
     <title>TaskFlux - Advanced Task Management</title>
-    
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
