@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Calendar, Flag, Sparkles } from 'lucide-react';
 import { Task } from '../types';
+import { DatePicker } from './DatePicker';
 
 interface AddTaskInputProps {
   onAddTask: (title: string, priority: Task['priority'], dueDate?: Date) => void;
@@ -10,7 +11,7 @@ interface AddTaskInputProps {
 const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority }) => {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Task['priority']>(defaultPriority);
-  const [dueDate, setDueDate] = useState('');
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [showOptions, setShowOptions] = useState(false);
 
   // Update priority when defaultPriority changes
@@ -21,11 +22,10 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
-      const dueDateObj = dueDate ? new Date(dueDate) : undefined;
       // Use the current priority state, not defaultPriority
-      onAddTask(title.trim(), priority, dueDateObj);
+      onAddTask(title.trim(), priority, dueDate);
       setTitle('');
-      setDueDate('');
+      setDueDate(undefined);
       // Reset to current default priority after creating task
       setPriority(defaultPriority);
       setShowOptions(false);
@@ -107,16 +107,12 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Due Date</label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-4 py-3 text-sm border border-gray-200/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-300 transition-all duration-200 bg-white/70 backdrop-blur-sm hover:border-gray-300"
-                />
-                <Calendar className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
+              <DatePicker
+                date={dueDate}
+                onDateChange={setDueDate}
+                placeholder="Select due date"
+                label="Due Date"
+              />
             </div>
           </div>
         </div>
