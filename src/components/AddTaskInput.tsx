@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Plus, Calendar, Flag, Sparkles } from 'lucide-react';
+import { Plus, Flag, Sparkles, Tag, X } from 'lucide-react';
 import { Task } from '../types';
+import { DatePicker } from './DatePicker';
 
 interface AddTaskInputProps {
-  onAddTask: (title: string, priority: Task['priority'], dueDate?: Date) => void;
+  onAddTask: (title: string, priority: Task['priority'], dueDate?: Date, tags?: string[]) => void;
   defaultPriority: Task['priority'];
 }
 
 const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority }) => {
   const [title, setTitle] = useState('');
   const [priority, setPriority] = useState<Task['priority']>(defaultPriority);
-  const [dueDate, setDueDate] = useState('');
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [showOptions, setShowOptions] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState('');
 
   // Update priority when defaultPriority changes
   React.useEffect(() => {
@@ -21,11 +24,11 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
-      const dueDateObj = dueDate ? new Date(dueDate) : undefined;
-      // Use the current priority state, not defaultPriority
-      onAddTask(title.trim(), priority, dueDateObj);
+      onAddTask(title.trim(), priority, dueDate, tags);
       setTitle('');
-      setDueDate('');
+      setDueDate(undefined);
+      setTags([]);
+      setNewTag('');
       // Reset to current default priority after creating task
       setPriority(defaultPriority);
       setShowOptions(false);
@@ -65,8 +68,8 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
             onClick={() => setShowOptions(!showOptions)}
             className={`flex-shrink-0 p-3.5 rounded-xl transition-all duration-200 hover:shadow-md ${
               showOptions 
-                ? 'bg-blue-100 text-blue-600 shadow-md' 
-                : 'bg-gray-100/70 text-gray-600 hover:bg-gray-200/70'
+                ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 shadow-md' 
+                : 'bg-gray-100/70 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700/80'
             }`}
           >
             <Flag className={`w-4 h-4 transition-transform ${showOptions ? 'scale-110' : ''}`} />
@@ -80,8 +83,8 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
           </button>
         </div>
 
-        <div className={`overflow-hidden transition-all duration-300 ease-out ${
-          showOptions ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        <div className={`transition-all duration-300 ease-out ${
+          showOptions ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
         }`}>
           <div className="p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-gray-200/50 space-y-4 shadow-lg">
             <div>
@@ -100,22 +103,74 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
                   </button>
                 ))}
               </div>
-              {/* Debug info - remove this after testing */}
-              <div className="mt-2 text-xs text-gray-500">
-                Current priority: {priority} | Default: {defaultPriority}
-              </div>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Due Date</label>
-              <div className="relative">
-                <input
-                  type="date"
+              <div className="relative overflow-visible">
+                <DatePicker
                   value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-4 py-3 text-sm border border-gray-200/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-300 transition-all duration-200 bg-white/70 backdrop-blur-sm hover:border-gray-300"
+                  onChange={setDueDate}
+                  label={undefined}
+                  placeholder="Select due date"
+                  className="w-full"
                 />
-                <Calendar className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Tags</label>
+              <div className="space-y-2">
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full"
+                      >
+                        <Tag className="w-2 h-2 mr-1" />
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                          className="ml-1 hover:text-purple-900"
+                        >
+                          <X className="w-2 h-2" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && newTag.trim()) {
+                        e.preventDefault();
+                        if (!tags.includes(newTag.trim())) {
+                          setTags([...tags, newTag.trim()]);
+                        }
+                        setNewTag('');
+                      }
+                    }}
+                    placeholder="Add tag..."
+                    className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newTag.trim() && !tags.includes(newTag.trim())) {
+                        setTags([...tags, newTag.trim()]);
+                        setNewTag('');
+                      }
+                    }}
+                    className="px-3 py-2 text-xs bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             </div>
           </div>

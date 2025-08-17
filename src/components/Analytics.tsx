@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
-import { BarChart3, TrendingUp, Clock, Target, Users, Calendar, X, Download, Filter } from 'lucide-react';
-import { TodoList, AnalyticsData, Task } from '../types';
-import { getAnalyticsData, getProductivityTrends } from '../utils/analyticsUtils';
+import React, { useMemo } from 'react';
+import { BarChart3, TrendingUp, Clock, Target, Users, X, Download } from 'lucide-react';
+import { TodoList } from '../types';
+import { getAnalyticsData } from '../utils/analyticsUtils';
 
 interface AnalyticsProps {
   lists: TodoList[];
@@ -10,11 +10,7 @@ interface AnalyticsProps {
 }
 
 const Analytics: React.FC<AnalyticsProps> = ({ lists, isOpen, onClose }) => {
-  const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [selectedMetric, setSelectedMetric] = useState<'productivity' | 'time' | 'completion' | 'collaboration'>('productivity');
-
-  const analytics = useMemo(() => getAnalyticsData(lists, timeRange), [lists, timeRange]);
-  const trends = useMemo(() => getProductivityTrends(lists, timeRange), [lists, timeRange]);
+  const analytics = useMemo(() => getAnalyticsData(lists, 'month'), [lists]);
 
   if (!isOpen) return null;
 
@@ -44,86 +40,10 @@ const Analytics: React.FC<AnalyticsProps> = ({ lists, isOpen, onClose }) => {
     </div>
   );
 
-  const ProductivityChart = () => (
-    <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Productivity Trends</h3>
-        <div className="flex space-x-2">
-          {(['week', 'month', 'quarter', 'year'] as const).map((range) => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
-                timeRange === range
-                  ? 'bg-blue-100 text-blue-800'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              {range.charAt(0).toUpperCase() + range.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
-      
-      <div className="h-64 flex items-end space-x-2">
-        {trends.map((trend, index) => (
-          <div key={index} className="flex-1 flex flex-col items-center">
-            <div className="w-full bg-gray-200 rounded-t-lg overflow-hidden" style={{ height: '200px' }}>
-              <div
-                className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all duration-500"
-                style={{ height: `${(trend.productivity / 100) * 200}px` }}
-              />
-            </div>
-            <div className="mt-2 text-xs text-gray-600 text-center">
-              {new Date(trend.date).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric' 
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const TimeDistribution = () => {
-    const totalTime = Object.values(analytics.timeTracking.timeByPriority).reduce((sum, time) => sum + time, 0);
-    
-    return (
-      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Time Distribution by Priority</h3>
-        <div className="space-y-4">
-          {Object.entries(analytics.timeTracking.timeByPriority).map(([priority, time]) => {
-            const percentage = totalTime > 0 ? (time / totalTime) * 100 : 0;
-            const color = priority === 'high' ? 'bg-red-500' : 
-                         priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500';
-            
-            return (
-              <div key={priority} className="flex items-center space-x-3">
-                <div className="w-16 text-sm font-medium text-gray-700 capitalize">
-                  {priority}
-                </div>
-                <div className="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div
-                    className={`h-full ${color} transition-all duration-500`}
-                    style={{ width: `${percentage}%` }}
-                  />
-                </div>
-                <div className="w-16 text-sm text-gray-600 text-right">
-                  {Math.round(time)}h
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
   const CompletionStats = () => (
     <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/50">
       <h3 className="text-lg font-semibold text-gray-900 mb-6">Completion Analysis</h3>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
         <div className="text-center">
           <div className="text-3xl font-bold text-green-600 mb-2">
             {analytics.completion.completionRate}%
@@ -213,12 +133,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ lists, isOpen, onClose }) => {
           </div>
 
           {/* Charts and Analysis */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            <ProductivityChart />
-            <TimeDistribution />
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-6 mb-8">
             <CompletionStats />
           </div>
 

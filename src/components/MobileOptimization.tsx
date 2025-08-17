@@ -188,12 +188,15 @@ export const MobileTaskView: React.FC<MobileTaskViewProps> = ({
       </div>
       
       <div className="flex justify-end space-x-2 mt-4 pt-3 border-t border-gray-200/50">
-        <button
-          onClick={onEdit}
-          className="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          Edit
-        </button>
+        {/* Only show edit button for incomplete tasks */}
+        {!task.completed && (
+          <button
+            onClick={onEdit}
+            className="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          >
+            Edit
+          </button>
+        )}
         <button
           onClick={onDelete}
           className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"

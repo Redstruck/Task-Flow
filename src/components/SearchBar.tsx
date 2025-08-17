@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Filter, X, Tag, Calendar, User, AlertCircle } from 'lucide-react';
-import { SearchFilters, Task } from '../types';
+import { Search, Filter, X, Tag, Calendar, AlertCircle } from 'lucide-react';
+import { SearchFilters } from '../types';
+import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
 
 interface SearchBarProps {
   filters: SearchFilters;
@@ -12,8 +13,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ filters, onFiltersChange, allTags
   const [showFilters, setShowFilters] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const { enabled } = useKeyboardShortcutsContext();
 
   useEffect(() => {
+    if (!enabled) return;
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
@@ -23,7 +27,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ filters, onFiltersChange, allTags
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [enabled]);
 
   const handleQueryChange = (query: string) => {
     onFiltersChange({ ...filters, query });
@@ -76,8 +80,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ filters, onFiltersChange, allTags
             onClick={() => setShowFilters(!showFilters)}
             className={`p-2 rounded-lg transition-all duration-200 hover:shadow-md ${
               showFilters || hasActiveFilters
-                ? 'bg-blue-100 text-blue-600 shadow-md'
-                : 'bg-gray-100/70 text-gray-600 hover:bg-gray-200/70'
+                ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 shadow-md'
+                : 'bg-gray-100/70 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700/80'
             }`}
           >
             <Filter className="w-4 h-4" />

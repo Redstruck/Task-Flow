@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, Flag, User, FileText, Tag, Filter, Eye } from 'lucide-react';
-import { Task, TodoList, SearchFilters } from '../types';
-import { getPriorityColor, formatDueDate } from '../utils/taskUtils';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, Flag, User, FileText, Tag } from 'lucide-react';
+import { Task, TodoList } from '../types';
 
 interface CalendarViewProps {
   lists: TodoList[];
@@ -31,13 +30,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
-  const [filters, setFilters] = useState<SearchFilters>({
-    query: '',
-    priority: undefined,
-    completed: undefined,
-    tags: [],
-  });
 
   // Get all tasks with their list information
   const allTasksWithList = useMemo(() => {
@@ -57,29 +49,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     return tasks;
   }, [lists]);
 
-  // Filter tasks based on current filters
-  const filteredTasks = useMemo(() => {
-    return allTasksWithList.filter(task => {
-      if (filters.priority && task.priority !== filters.priority) return false;
-      if (filters.completed !== undefined && task.completed !== filters.completed) return false;
-      if (filters.tags && filters.tags.length > 0) {
-        const taskTags = task.tags || [];
-        if (!filters.tags.some(tag => taskTags.includes(tag))) return false;
-      }
-      if (filters.query) {
-        const searchText = `${task.title} ${task.description || ''}`.toLowerCase();
-        if (!searchText.includes(filters.query.toLowerCase())) return false;
-      }
-      return true;
-    });
-  }, [allTasksWithList, filters]);
-
   // Generate calendar days for the current month
   const calendarDays = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
@@ -91,7 +65,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + i);
       
-      const dayTasks = filteredTasks.filter(task => {
+      const dayTasks = allTasksWithList.filter(task => {
         const taskDate = new Date(task.dueDate!);
         return taskDate.toDateString() === date.toDateString();
       });
@@ -105,7 +79,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     }
 
     return days;
-  }, [currentDate, filteredTasks]);
+  }, [currentDate, allTasksWithList]);
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentDate(prev => {
@@ -116,7 +90,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   const getTasksByDate = (date: Date) => {
-    return filteredTasks.filter(task => {
+    return allTasksWithList.filter(task => {
       const taskDate = new Date(task.dueDate!);
       return taskDate.toDateString() === date.toDateString();
     });
@@ -150,10 +124,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
         </div>
 
         <div className="flex h-[calc(90vh-120px)]">
-          {/* Calendar */}
-          <div className="flex-1 p-8">
+          {/* Left side - Calendar */}
+          <div className="flex-1 p-6">
             {/* Calendar Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => navigateMonth('prev')}
@@ -162,7 +136,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl font-bold text-gray-900">
                   {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </h3>
                 
@@ -182,15 +156,16 @@ const CalendarView: React.FC<CalendarViewProps> = ({
               </button>
             </div>
 
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-0 mb-4">
+            {/* Weekday Headers */}
+            <div className="grid grid-cols-7 gap-0 mb-2">
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                <div key={day} className="p-4 text-center text-sm font-medium text-gray-500">
+                <div key={day} className="p-3 text-center text-sm font-medium text-gray-500">
                   {day}
                 </div>
               ))}
             </div>
 
+            {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-0 border border-gray-200 rounded-lg overflow-hidden">
               {calendarDays.map((day, index) => {
                 const isSelected = selectedDate?.toDateString() === day.date.toDateString();
@@ -198,7 +173,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                 return (
                   <div
                     key={index}
-                    className={`relative h-20 border-r border-b border-gray-200 cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
+                    className={`relative h-16 border-r border-b border-gray-200 cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
                       day.isCurrentMonth ? 'bg-white' : 'bg-gray-50'
                     } ${day.isToday ? 'bg-blue-600 text-white' : ''} ${
                       isSelected ? 'bg-blue-100' : ''
@@ -237,7 +212,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                           </div>
                         ) : (
                           <div className="flex items-center justify-center">
-                            <div className="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                            <div className="w-4 h-4 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
                               {day.tasks.length}
                             </div>
                           </div>
@@ -250,120 +225,131 @@ const CalendarView: React.FC<CalendarViewProps> = ({
             </div>
           </div>
 
-          {/* Task Details Panel */}
-          {selectedDate && (
-            <div className="w-96 border-l border-gray-200 bg-gray-50 p-6 overflow-y-auto">
-              <div className="mb-4">
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                  {selectedDate.toLocaleDateString('en-US', { 
+          {/* Right sidebar - Selected Date Info */}
+          <div className="w-80 border-l border-gray-200 bg-gray-50">
+            <div className="p-6">
+              <div className="mb-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-1">
+                  {selectedDate ? selectedDate.toLocaleDateString('en-US', { 
                     weekday: 'long',
                     month: 'long', 
                     day: 'numeric',
                     year: 'numeric'
-                  })}
+                  }) : 'Select a date'}
                 </h4>
                 <p className="text-sm text-gray-600">
-                  {selectedDateTasks.length} task{selectedDateTasks.length !== 1 ? 's' : ''} due
+                  {selectedDate ? `${selectedDateTasks.length} tasks due` : 'Click on a date to see tasks'}
                 </p>
               </div>
 
-              <div className="space-y-3">
-                {selectedDateTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h5 className={`font-medium text-gray-900 mb-1 ${
-                          task.completed ? 'line-through text-gray-500' : ''
-                        }`}>
-                          {task.title}
-                        </h5>
-                        <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium bg-${task.listColor}-100 text-${task.listColor}-800`}>
-                            {task.listTitle}
-                          </span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            task.priority === 'high' ? 'bg-red-100 text-red-800' :
-                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
+              <div className="space-y-3 overflow-y-auto max-h-[calc(90vh-250px)]">
+                {selectedDate ? (
+                  selectedDateTasks.length > 0 ? (
+                    selectedDateTasks.map((task) => (
+                      <div
+                        key={task.id}
+                        className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h5 className={`font-medium text-gray-900 mb-1 ${
+                              task.completed ? 'line-through text-gray-500' : ''
+                            }`}>
+                              {task.title}
+                            </h5>
+                            <div className="flex items-center space-x-2 text-xs text-gray-500 mb-2">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium bg-${task.listColor}-100 text-${task.listColor}-800`}>
+                                {task.listTitle}
+                              </span>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                task.priority === 'high' ? 'bg-red-100 text-red-800' :
+                                task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-green-100 text-green-800'
+                              }`}>
+                                <Flag className={`w-3 h-3 mr-1 ${
+                                  task.priority === 'high' ? 'text-red-600' :
+                                  task.priority === 'medium' ? 'text-yellow-600' : 'text-green-600'
+                                }`} />
+                                {task.priority}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <button
+                            onClick={() => onUpdateTask(task.listId, task.id, { completed: !task.completed })}
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                              task.completed
+                                ? 'bg-green-500 border-green-500 text-white'
+                                : 'border-gray-300 hover:border-green-400'
+                            }`}
+                          >
+                            {task.completed && <span className="text-xs">✓</span>}
+                          </button>
+                        </div>
+
+                        {task.description && (
+                          <p className={`text-sm text-gray-600 mb-3 ${
+                            task.completed ? 'line-through' : ''
                           }`}>
-                            {task.priority}
-                          </span>
+                            {task.description}
+                          </p>
+                        )}
+
+                        <div className="space-y-2">
+                          {task.dueDate && (
+                            <div className="flex items-center space-x-2 text-xs text-gray-500">
+                              <Clock className="w-3 h-3" />
+                              <span>Due: {new Date(task.dueDate).toLocaleTimeString('en-US', { 
+                                hour: 'numeric', 
+                                minute: '2-digit' 
+                              })}</span>
+                            </div>
+                          )}
+                          
+                          {task.assignee && (
+                            <div className="flex items-center space-x-2 text-xs text-gray-500">
+                              <User className="w-3 h-3" />
+                              <span>Assigned to: {task.assignee}</span>
+                            </div>
+                          )}
+                          
+                          {task.tags && task.tags.length > 0 && (
+                            <div className="flex items-center space-x-2 text-xs text-gray-500">
+                              <Tag className="w-3 h-3" />
+                              <div className="flex flex-wrap gap-1">
+                                {task.tags.map((tag, index) => (
+                                  <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {task.attachments && task.attachments.length > 0 && (
+                            <div className="flex items-center space-x-2 text-xs text-gray-500">
+                              <FileText className="w-3 h-3" />
+                              <span>{task.attachments.length} attachment{task.attachments.length !== 1 ? 's' : ''}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
-                      
-                      <button
-                        onClick={() => onUpdateTask(task.listId, task.id, { completed: !task.completed })}
-                        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
-                          task.completed
-                            ? 'bg-green-500 border-green-500 text-white'
-                            : 'border-gray-300 hover:border-green-400'
-                        }`}
-                      >
-                        {task.completed && <span className="text-xs">✓</span>}
-                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm">No tasks due on this date</p>
                     </div>
-
-                    {task.description && (
-                      <p className={`text-sm text-gray-600 mb-3 ${
-                        task.completed ? 'line-through' : ''
-                      }`}>
-                        {task.description}
-                      </p>
-                    )}
-
-                    <div className="space-y-2">
-                      {task.dueDate && (
-                        <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <Clock className="w-3 h-3" />
-                          <span>Due: {new Date(task.dueDate).toLocaleTimeString('en-US', { 
-                            hour: 'numeric', 
-                            minute: '2-digit' 
-                          })}</span>
-                        </div>
-                      )}
-                      
-                      {task.assignee && (
-                        <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <User className="w-3 h-3" />
-                          <span>Assigned to: {task.assignee}</span>
-                        </div>
-                      )}
-                      
-                      {task.tags && task.tags.length > 0 && (
-                        <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <Tag className="w-3 h-3" />
-                          <div className="flex flex-wrap gap-1">
-                            {task.tags.map((tag, index) => (
-                              <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {task.attachments && task.attachments.length > 0 && (
-                        <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <FileText className="w-3 h-3" />
-                          <span>{task.attachments.length} attachment{task.attachments.length !== 1 ? 's' : ''}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {selectedDateTasks.length === 0 && (
+                  )
+                ) : (
                   <div className="text-center py-8">
                     <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500 text-sm">No tasks due on this date</p>
+                    <p className="text-gray-500 text-sm">Select a date to view tasks</p>
                   </div>
                 )}
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

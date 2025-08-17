@@ -8,10 +8,16 @@ interface KeyboardShortcutsConfig {
   onSelectAll: () => void;
   onMarkAllComplete: () => void;
   onEscape: () => void;
+  enabled?: boolean; // Add enabled parameter
 }
 
 export const useKeyboardShortcuts = (config: KeyboardShortcutsConfig) => {
   useEffect(() => {
+    // If shortcuts are disabled, don't set up any listeners
+    if (config.enabled === false) {
+      return;
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger shortcuts when typing in inputs
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Settings as SettingsIcon, X, Bell, Keyboard, Palette, Clock, Globe, Download, Upload, Trash2, Moon, Sun, Monitor, Focus, Shield, Info, AlertCircle, CheckCircle, Target } from 'lucide-react';
-import { AppSettings, NotificationSettings, ProductivitySettings } from '../types';
+import { Settings as SettingsIcon, X, Bell, Globe, Download, Upload, Trash2, Info, AlertCircle, CheckCircle, Target } from 'lucide-react';
+import { AppSettings, NotificationSettings } from '../types';
 
 interface SettingsProps {
   settings: AppSettings;
@@ -8,6 +8,7 @@ interface SettingsProps {
   onExportData: () => void;
   onImportData: (file: File) => void;
   onClearData: () => void;
+  onDeleteAllCompletedTasks: () => void;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -18,18 +19,17 @@ const Settings: React.FC<SettingsProps> = ({
   onExportData,
   onImportData,
   onClearData,
+  onDeleteAllCompletedTasks,
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'general' | 'notifications' | 'productivity' | 'security' | 'data'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'notifications' | 'data'>('general');
 
   if (!isOpen) return null;
 
   const tabs = [
     { id: 'general', label: 'General', icon: SettingsIcon },
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'productivity', label: 'Productivity', icon: Focus },
-    { id: 'security', label: 'Security', icon: Shield },
     { id: 'data', label: 'Data', icon: Download },
   ];
 
@@ -53,13 +53,7 @@ const Settings: React.FC<SettingsProps> = ({
     onUpdateSettings(newSettings);
   };
 
-  const updateProductivity = (updates: Partial<ProductivitySettings>) => {
-    const newSettings = {
-      ...settings,
-      productivity: { ...settings.productivity, ...updates }
-    };
-    onUpdateSettings(newSettings);
-  };
+
 
   const ToggleSwitch = ({ checked, onChange, label, description }: {
     checked: boolean;
@@ -67,10 +61,10 @@ const Settings: React.FC<SettingsProps> = ({
     label: string;
     description: string;
   }) => (
-    <div className="flex items-center justify-between p-5 bg-white/60 dark:bg-gray-800/40 rounded-xl border border-gray-200/60 dark:border-gray-700/40 hover:bg-white/80 dark:hover:bg-gray-800/60 transition-all duration-300 hover:shadow-md hover:border-gray-300/60 dark:hover:border-gray-600/60">
+    <div className="flex items-center justify-between p-5 bg-white/70 dark:bg-gray-800/60 rounded-xl border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/90 dark:hover:bg-gray-800/80 transition-all duration-300 hover:shadow-md hover:border-gray-300/60 dark:hover:border-gray-600/50">
       <div className="flex-1 pr-4">
-        <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">{label}</h4>
-        <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{description}</p>
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{label}</h4>
+        <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{description}</p>
       </div>
       <button
         onClick={() => onChange(!checked)}
@@ -94,8 +88,8 @@ const Settings: React.FC<SettingsProps> = ({
     children: React.ReactNode;
     icon?: React.ElementType;
   }) => (
-    <div className="bg-white/70 dark:bg-gray-800/50 rounded-2xl border border-gray-200/50 dark:border-gray-700/30 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-      <div className="p-6 border-b border-gray-200/50 dark:border-gray-700/30 bg-gradient-to-r from-gray-50/50 to-white/50 dark:from-gray-800/30 dark:to-gray-700/30">
+    <div className="bg-white/80 dark:bg-gray-800/70 rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+      <div className="p-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-gray-50/60 to-white/60 dark:from-gray-800/40 dark:to-gray-700/40">
         <div className="flex items-center space-x-3">
           {Icon && (
             <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-md">
@@ -149,7 +143,7 @@ const Settings: React.FC<SettingsProps> = ({
           <IconComponent className={`w-5 h-5 mt-0.5 ${style.iconColor}`} />
           <div className="flex-1">
             <h4 className={`text-sm font-semibold mb-2 ${style.titleColor}`}>{title}</h4>
-            <div className="text-sm text-gray-700 dark:text-gray-300">
+            <div className="text-sm text-gray-700 dark:text-gray-200">
               {children}
             </div>
           </div>
@@ -172,18 +166,18 @@ const Settings: React.FC<SettingsProps> = ({
     disabled?: boolean;
   }) => {
     const variants = {
-      primary: 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl',
-      secondary: 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600',
-      danger: 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-xl',
+      primary: 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl hover:scale-105',
+      secondary: 'bg-gray-100 dark:bg-gray-700/80 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:shadow-md hover:scale-105 hover:border-gray-400 dark:hover:border-gray-500',
+      danger: 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-xl hover:scale-105',
     };
 
     return (
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]}`}
+        className={`group px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0 ${variants[variant]}`}
       >
-        <Icon className="w-4 h-4" />
+        <Icon className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
         <span>{children}</span>
       </button>
     );
@@ -232,7 +226,7 @@ const Settings: React.FC<SettingsProps> = ({
             className={`group relative p-4 rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
               value === priority.value
                 ? `${priority.bgColor} ${priority.borderColor} shadow-md ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-800 ring-blue-500/50`
-                : 'bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                : 'bg-white dark:bg-gray-800/70 border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600/80 hover:bg-gray-50 dark:hover:bg-gray-800/90'
             }`}
           >
             <div className="flex items-center space-x-4">
@@ -271,50 +265,13 @@ const Settings: React.FC<SettingsProps> = ({
 
   const GeneralSettings = () => (
     <div className="space-y-8 settings-content">
-      <SettingsCard title="Appearance" icon={Palette}>
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">Theme Preference</label>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { value: 'light', label: 'Light', icon: Sun, desc: 'Clean and bright' },
-                { value: 'dark', label: 'Dark', icon: Moon, desc: 'Easy on the eyes' },
-                { value: 'auto', label: 'Auto', icon: Monitor, desc: 'Follows system' }
-              ].map((theme) => (
-                <button
-                  key={theme.value}
-                  onClick={() => updateSettings({ theme: theme.value as AppSettings['theme'] })}
-                  className={`group flex flex-col items-center space-y-3 px-4 py-6 text-sm font-medium rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
-                    settings.theme === theme.value
-                      ? 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-800 dark:text-blue-200 border-blue-300 dark:border-blue-600 shadow-lg ring-2 ring-blue-500/20'
-                      : 'text-gray-600 dark:text-gray-300 bg-white/50 dark:bg-gray-800/30 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:border-gray-300 dark:hover:border-gray-600'
-                  }`}
-                >
-                  <div className={`p-3 rounded-full transition-all duration-300 ${
-                    settings.theme === theme.value 
-                      ? 'bg-blue-100 dark:bg-blue-800/50' 
-                      : 'bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600'
-                  }`}>
-                    <theme.icon className="w-5 h-5" />
-                  </div>
-                  <div className="text-center">
-                    <div className="font-semibold">{theme.label}</div>
-                    <div className="text-xs opacity-75 mt-1">{theme.desc}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </SettingsCard>
-
       <SettingsCard title="Task Defaults" icon={Target}>
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">
+            <label className="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
               Default Priority Level
             </label>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
               New tasks will automatically use this priority level unless specified otherwise
             </p>
             <PrioritySelector
@@ -329,43 +286,11 @@ const Settings: React.FC<SettingsProps> = ({
         </div>
       </SettingsCard>
 
-      <SettingsCard title="Working Hours" icon={Clock}>
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Start Time</label>
-              <input
-                type="time"
-                value={settings.workingHours.start}
-                onChange={(e) => updateSettings({
-                  workingHours: { ...settings.workingHours, start: e.target.value }
-                })}
-                className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">End Time</label>
-              <input
-                type="time"
-                value={settings.workingHours.end}
-                onChange={(e) => updateSettings({
-                  workingHours: { ...settings.workingHours, end: e.target.value }
-                })}
-                className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-              />
-            </div>
-          </div>
-          <InfoBox type="info" title="Productivity Tracking">
-            These hours are used for productivity analytics and smart notifications
-          </InfoBox>
-        </div>
-      </SettingsCard>
-
       <SettingsCard title="Preferences" icon={Globe}>
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Time Format</label>
+              <label className="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">Time Format</label>
               <div className="flex space-x-3">
                 {(['12h', '24h'] as const).map((format) => (
                   <button
@@ -373,8 +298,8 @@ const Settings: React.FC<SettingsProps> = ({
                     onClick={() => updateSettings({ timeFormat: format })}
                     className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200 ${
                       settings.timeFormat === format
-                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700 shadow-md'
-                        : 'text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100 border-blue-200 dark:border-blue-600/60 shadow-md'
+                        : 'text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700/60 hover:bg-gray-50 dark:hover:bg-gray-700/70 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     {format}
@@ -383,7 +308,7 @@ const Settings: React.FC<SettingsProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Week Starts On</label>
+              <label className="block text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">Week Starts On</label>
               <div className="flex space-x-3">
                 {(['monday', 'sunday'] as const).map((day) => (
                   <button
@@ -391,8 +316,8 @@ const Settings: React.FC<SettingsProps> = ({
                     onClick={() => updateSettings({ weekStart: day })}
                     className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200 ${
                       settings.weekStart === day
-                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700 shadow-md'
-                        : 'text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100 border-blue-200 dark:border-blue-600/60 shadow-md'
+                        : 'text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800/60 border-gray-200 dark:border-gray-700/60 hover:bg-gray-50 dark:hover:bg-gray-700/70 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     {day.charAt(0).toUpperCase() + day.slice(1)}
@@ -450,40 +375,11 @@ const Settings: React.FC<SettingsProps> = ({
               />
 
               <ToggleSwitch
-                checked={settings.notifications.email}
-                onChange={(checked) => updateNotifications({ email: checked })}
-                label="Email Notifications"
-                description="Receive important updates via email"
-              />
-
-              <ToggleSwitch
                 checked={settings.notifications.dueDateReminders}
                 onChange={(checked) => updateNotifications({ dueDateReminders: checked })}
                 label="Due Date Reminders"
                 description="Get notified about upcoming task deadlines"
               />
-
-              <ToggleSwitch
-                checked={settings.notifications.dailyDigest}
-                onChange={(checked) => updateNotifications({ dailyDigest: checked })}
-                label="Daily Digest"
-                description="Receive a daily summary of your tasks and progress"
-              />
-            </div>
-          </SettingsCard>
-
-          <SettingsCard title="Timing & Schedule" icon={Clock}>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Daily Reminder Time</label>
-              <input
-                type="time"
-                value={settings.notifications.reminderTime}
-                onChange={(e) => updateNotifications({ reminderTime: e.target.value })}
-                className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Time for daily digest and reminder notifications
-              </p>
             </div>
           </SettingsCard>
         </>
@@ -491,224 +387,25 @@ const Settings: React.FC<SettingsProps> = ({
     </div>
   );
 
-  const ProductivitySettings = () => (
-    <div className="space-y-8 settings-content">
-      <SettingsCard title="Focus & Productivity" icon={Focus}>
-        <div className="space-y-4">
-          <ToggleSwitch
-            checked={settings.productivity.focusMode}
-            onChange={(checked) => updateProductivity({ focusMode: checked })}
-            label="Focus Mode"
-            description="Reduce visual distractions and enhance concentration"
-          />
 
-          <ToggleSwitch
-            checked={settings.productivity.timeBlocking}
-            onChange={(checked) => updateProductivity({ timeBlocking: checked })}
-            label="Time Blocking"
-            description="Schedule tasks in dedicated time blocks for better planning"
-          />
 
-          <ToggleSwitch
-            checked={settings.productivity.deepWorkSessions}
-            onChange={(checked) => updateProductivity({ deepWorkSessions: checked })}
-            label="Deep Work Sessions"
-            description="Track and optimize periods of focused, uninterrupted work"
-          />
-        </div>
-      </SettingsCard>
 
-      <SettingsCard title="Productivity Goals" icon={Target}>
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Daily Tasks Target</label>
-            <input
-              type="number"
-              min="1"
-              max="50"
-              value={settings.productivity.productivityGoals.dailyTasks}
-              onChange={(e) => updateProductivity({
-                productivityGoals: {
-                  ...settings.productivity.productivityGoals,
-                  dailyTasks: parseInt(e.target.value) || 5
-                }
-              })}
-              className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Weekly Hours Goal</label>
-            <input
-              type="number"
-              min="1"
-              max="168"
-              value={settings.productivity.productivityGoals.weeklyHours}
-              onChange={(e) => updateProductivity({
-                productivityGoals: {
-                  ...settings.productivity.productivityGoals,
-                  weeklyHours: parseInt(e.target.value) || 40
-                }
-              })}
-              className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Focus Hours/Day</label>
-            <input
-              type="number"
-              min="1"
-              max="12"
-              value={settings.productivity.productivityGoals.focusHours}
-              onChange={(e) => updateProductivity({
-                productivityGoals: {
-                  ...settings.productivity.productivityGoals,
-                  focusHours: parseInt(e.target.value) || 4
-                }
-              })}
-              className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Learning Hours/Week</label>
-            <input
-              type="number"
-              min="0"
-              max="40"
-              value={settings.productivity.productivityGoals.learningHours}
-              onChange={(e) => updateProductivity({
-                productivityGoals: {
-                  ...settings.productivity.productivityGoals,
-                  learningHours: parseInt(e.target.value) || 2
-                }
-              })}
-              className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-            />
-          </div>
-        </div>
-      </SettingsCard>
-    </div>
-  );
-
-  const SecuritySettings = () => (
-    <div className="space-y-8 settings-content">
-      <SettingsCard title="Data Protection" icon={Shield}>
-        <div className="space-y-4">
-          <ToggleSwitch
-            checked={settings.security.dataEncryption}
-            onChange={(checked) => updateSettings({
-              security: { ...settings.security, dataEncryption: checked }
-            })}
-            label="Data Encryption"
-            description="Encrypt sensitive data stored locally for enhanced security"
-          />
-
-          <ToggleSwitch
-            checked={settings.security.auditLogging}
-            onChange={(checked) => updateSettings({
-              security: { ...settings.security, auditLogging: checked }
-            })}
-            label="Audit Logging"
-            description="Keep detailed logs of all actions for security monitoring"
-          />
-        </div>
-      </SettingsCard>
-
-      <SettingsCard title="Session Management" icon={Clock}>
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Session Timeout</label>
-          <select
-            value={settings.security.sessionTimeout}
-            onChange={(e) => updateSettings({
-              security: { ...settings.security, sessionTimeout: parseInt(e.target.value) }
-            })}
-            className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-          >
-            <option value={30}>30 minutes</option>
-            <option value={60}>1 hour</option>
-            <option value={120}>2 hours</option>
-            <option value={240}>4 hours</option>
-            <option value={480}>8 hours</option>
-            <option value={1440}>24 hours</option>
-          </select>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            Automatically log out after this period of inactivity
-          </p>
-        </div>
-      </SettingsCard>
-
-      <SettingsCard title="Password Policy" icon={Shield}>
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Minimum Length</label>
-            <input
-              type="number"
-              min="4"
-              max="32"
-              value={settings.security.passwordPolicy.minLength}
-              onChange={(e) => updateSettings({
-                security: {
-                  ...settings.security,
-                  passwordPolicy: {
-                    ...settings.security.passwordPolicy,
-                    minLength: parseInt(e.target.value) || 8
-                  }
-                }
-              })}
-              className="w-full px-4 py-3 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <ToggleSwitch
-              checked={settings.security.passwordPolicy.requireUppercase}
-              onChange={(checked) => updateSettings({
-                security: {
-                  ...settings.security,
-                  passwordPolicy: {
-                    ...settings.security.passwordPolicy,
-                    requireUppercase: checked
-                  }
-                }
-              })}
-              label="Require Uppercase"
-              description="Must include capital letters"
-            />
-            
-            <ToggleSwitch
-              checked={settings.security.passwordPolicy.requireNumbers}
-              onChange={(checked) => updateSettings({
-                security: {
-                  ...settings.security,
-                  passwordPolicy: {
-                    ...settings.security.passwordPolicy,
-                    requireNumbers: checked
-                  }
-                }
-              })}
-              label="Require Numbers"
-              description="Must include numeric digits"
-            />
-          </div>
-        </div>
-      </SettingsCard>
-    </div>
-  );
 
   const DataSettings = () => (
     <div className="space-y-8 settings-content">
       <SettingsCard title="Export & Backup" icon={Download}>
         <div className="space-y-6">
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Export Your Data</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Download all your data including tasks, lists, and settings in JSON format</p>
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">Export Your Data</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Download all your data including tasks, lists, and settings in JSON format</p>
             <ActionButton onClick={onExportData} variant="primary" icon={Download}>
               Export Data
             </ActionButton>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Import Data</h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Import data from a previous export or backup file</p>
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">Import Data</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Import data from a previous export or backup file</p>
             <label>
               <ActionButton onClick={() => {}} variant="secondary" icon={Upload}>
                 Import Data
@@ -725,12 +422,22 @@ const Settings: React.FC<SettingsProps> = ({
       </SettingsCard>
 
       <SettingsCard title="Data Management" icon={Trash2}>
-        <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Clear All Data</h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Permanently delete all tasks, lists, and settings. This action cannot be undone.</p>
-          <ActionButton onClick={onClearData} variant="danger" icon={Trash2}>
-            Clear All Data
-          </ActionButton>
+        <div className="space-y-6">
+          <div>
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">Delete Completed Tasks</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Remove all completed tasks from all lists. This helps keep your workspace clean and focused.</p>
+            <ActionButton onClick={onDeleteAllCompletedTasks} variant="secondary" icon={Trash2}>
+              Delete All Completed Tasks
+            </ActionButton>
+          </div>
+          
+          <div>
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3">Clear All Data</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">Permanently delete all tasks, lists, and settings. This action cannot be undone.</p>
+            <ActionButton onClick={onClearData} variant="danger" icon={Trash2}>
+              Clear All Data
+            </ActionButton>
+          </div>
         </div>
       </SettingsCard>
 
@@ -743,12 +450,6 @@ const Settings: React.FC<SettingsProps> = ({
             </span>
           </div>
           <div className="flex justify-between">
-            <span>Data encryption:</span>
-            <span className={settings.security.dataEncryption ? 'text-green-600 dark:text-green-400 font-medium' : 'text-red-600 dark:text-red-400 font-medium'}>
-              {settings.security.dataEncryption ? 'Enabled' : 'Disabled'}
-            </span>
-          </div>
-          <div className="flex justify-between">
             <span>Storage type:</span>
             <span className="font-medium">Local Browser Storage</span>
           </div>
@@ -758,21 +459,21 @@ const Settings: React.FC<SettingsProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-backdrop">
-      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 w-full max-w-6xl max-h-[90vh] overflow-hidden animate-in slide-in-from-top-2 duration-300 settings-modal">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200/50 dark:border-gray-700/50 bg-gradient-to-r from-white/80 to-gray-50/80 dark:from-gray-800/80 dark:to-gray-900/80 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-backdrop">
+      <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200/60 dark:border-gray-700/60 w-full max-w-6xl max-h-[90vh] overflow-hidden animate-in slide-in-from-top-2 duration-300 settings-modal">
+        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-white/90 to-gray-50/90 dark:from-gray-800/90 dark:to-gray-900/90 backdrop-blur-sm">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-gradient-to-br from-gray-600 to-gray-700 dark:from-gray-500 dark:to-gray-600 rounded-xl shadow-lg">
               <SettingsIcon className="w-6 h-6 text-white" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Settings</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Customize your TaskFlow experience</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Customize your TaskFlow experience</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/70 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -780,7 +481,7 @@ const Settings: React.FC<SettingsProps> = ({
 
         <div className="flex h-[calc(90vh-120px)]">
           {/* Enhanced Sidebar */}
-          <div className="w-72 bg-gradient-to-b from-gray-50/80 to-white/80 dark:from-gray-800/50 dark:to-gray-900/50 border-r border-gray-200/50 dark:border-gray-700/50 p-6 settings-sidebar overflow-y-auto">
+          <div className="w-72 bg-gradient-to-b from-gray-50/90 to-white/90 dark:from-gray-800/70 dark:to-gray-900/70 p-6 settings-sidebar overflow-y-auto">
             <nav className="space-y-3">
               {tabs.map((tab) => (
                 <button
@@ -789,13 +490,13 @@ const Settings: React.FC<SettingsProps> = ({
                   className={`w-full flex items-center space-x-4 px-5 py-4 text-sm font-medium rounded-xl transition-all duration-300 group ${
                     activeTab === tab.id
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 tab-active transform scale-105'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-white/60 dark:hover:bg-gray-700/50 hover:shadow-md tab-inactive'
+                      : 'text-gray-700 dark:text-gray-200 hover:bg-white/70 dark:hover:bg-gray-700/60 hover:shadow-md tab-inactive hover:text-gray-900 dark:hover:text-gray-100'
                   }`}
                 >
                   <div className={`p-2 rounded-lg transition-all duration-300 ${
                     activeTab === tab.id 
                       ? 'bg-white/20' 
-                      : 'bg-gray-100 dark:bg-gray-700 group-hover:bg-gray-200 dark:group-hover:bg-gray-600'
+                      : 'bg-gray-100 dark:bg-gray-700/80 group-hover:bg-gray-200 dark:group-hover:bg-gray-600/80'
                   }`}>
                     <tab.icon className="w-4 h-4" />
                   </div>
@@ -806,12 +507,10 @@ const Settings: React.FC<SettingsProps> = ({
           </div>
 
           {/* Enhanced Content */}
-          <div className="flex-1 p-8 overflow-y-auto settings-panel bg-gradient-to-br from-gray-50/30 to-white/30 dark:from-gray-900/30 dark:to-gray-800/30">
+          <div className="flex-1 p-8 overflow-y-auto settings-panel bg-gradient-to-br from-gray-50/40 to-white/40 dark:from-gray-900/40 dark:to-gray-800/40">
             <div className="settings-content-wrapper">
               {activeTab === 'general' && <GeneralSettings />}
               {activeTab === 'notifications' && <NotificationSettings />}
-              {activeTab === 'productivity' && <ProductivitySettings />}
-              {activeTab === 'security' && <SecuritySettings />}
               {activeTab === 'data' && <DataSettings />}
             </div>
           </div>

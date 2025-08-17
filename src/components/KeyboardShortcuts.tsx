@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Keyboard, X } from 'lucide-react';
+import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
 
 interface KeyboardShortcutsProps {
   isOpen: boolean;
@@ -7,7 +8,11 @@ interface KeyboardShortcutsProps {
 }
 
 const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ isOpen, onClose }) => {
+  const { enabled } = useKeyboardShortcutsContext();
+  
   useEffect(() => {
+    if (!enabled) return;
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -23,7 +28,7 @@ const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({ isOpen, onClose }
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, enabled]);
 
   if (!isOpen) return null;
 

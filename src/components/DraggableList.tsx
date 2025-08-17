@@ -9,13 +9,12 @@ interface DraggableListProps {
   list: TodoList;
   index: number;
   totalLists: number;
-  onAddTask: (listId: string, title: string, priority: any, dueDate?: Date) => void;
+  onAddTask: (listId: string, title: string, priority: any, dueDate?: Date, tags?: string[]) => void;
   onToggleTask: (listId: string, taskId: string) => void;
   onDeleteTask: (listId: string, taskId: string) => void;
   onUpdateTask: (listId: string, taskId: string, updates: any) => void;
   onUpdateList: (listId: string, updates: any) => void;
   onDeleteList: (listId: string) => void;
-  onDuplicateTask: (listId: string, taskId: string) => void;
   defaultPriority: Task['priority'];
 }
 
@@ -29,7 +28,6 @@ const DraggableList: React.FC<DraggableListProps> = ({
   onUpdateTask,
   onUpdateList,
   onDeleteList,
-  onDuplicateTask,
   defaultPriority,
 }) => {
   const {
@@ -72,12 +70,12 @@ const DraggableList: React.FC<DraggableListProps> = ({
       <div
         {...attributes}
         {...listeners}
-        className={`absolute -left-3 top-6 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing z-20 p-2 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200/50 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 ${
+        className={`absolute -left-3 top-6 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing z-20 p-2 rounded-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-600/50 transition-all duration-200 ${
           isDragging ? 'opacity-100' : ''
         }`}
         title="Drag to reorder list"
       >
-        <GripVertical className="w-4 h-4 text-gray-400 hover:text-blue-600 transition-colors" />
+        <GripVertical className="w-4 h-4 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" />
       </div>
 
       {/* Drop Indicator */}
@@ -100,7 +98,6 @@ const DraggableList: React.FC<DraggableListProps> = ({
           onUpdateTask={onUpdateTask}
           onUpdateList={onUpdateList}
           onDeleteList={onDeleteList}
-          onDuplicateTask={onDuplicateTask}
           defaultPriority={defaultPriority}
         />
       </div>

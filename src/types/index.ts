@@ -218,7 +218,7 @@ export interface WorkloadMetrics {
 }
 
 export interface UserPreferences {
-  theme: 'light' | 'dark' | 'auto';
+  theme: 'light';
   notifications: NotificationSettings;
   defaultView: string;
   workingHours: {
@@ -281,7 +281,7 @@ export interface SearchFilters {
 }
 
 export interface AppSettings {
-  theme: 'light' | 'dark' | 'auto';
+  theme: 'light';
   notifications: NotificationSettings;
   keyboardShortcuts: boolean;
   autoSave: boolean;
@@ -536,7 +536,6 @@ export interface AuditLog {
   userAgent: string;
 }
 
-
 export interface DragEndEvent {
   active: {
     id: string;
@@ -559,4 +558,16 @@ export interface DragEndEvent {
       };
     };
   } | null;
+}
+
+// Calendar Event interface for EventCalendar component
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  start: Date;
+  end: Date;
+  allDay?: boolean;
+  color: 'sky' | 'emerald' | 'amber' | 'orange' | 'rose' | 'violet' | 'indigo';
+  listId?: string;
 }

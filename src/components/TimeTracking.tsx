@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, Square, Clock, BarChart3 } from 'lucide-react';
+import { Play, Pause, Square, Clock } from 'lucide-react';
 import { Task } from '../types';
 
 interface TimeTrackingProps {
@@ -13,7 +13,7 @@ const TimeTracking: React.FC<TimeTrackingProps> = ({ task, onUpdateTime }) => {
   const [startTime, setStartTime] = useState<Date | null>(null);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     
     if (isTracking && startTime) {
       interval = setInterval(() => {
@@ -25,6 +25,13 @@ const TimeTracking: React.FC<TimeTrackingProps> = ({ task, onUpdateTime }) => {
       if (interval) clearInterval(interval);
     };
   }, [isTracking, startTime]);
+
+  // Stop tracking if task becomes completed
+  useEffect(() => {
+    if (task.completed && isTracking) {
+      handleStop();
+    }
+  }, [task.completed, isTracking]);
 
   const handleStart = () => {
     setIsTracking(true);
@@ -101,35 +108,37 @@ const TimeTracking: React.FC<TimeTrackingProps> = ({ task, onUpdateTime }) => {
         </div>
       )}
 
-      {/* Control Buttons */}
-      <div className="flex items-center space-x-1">
-        {!isTracking ? (
-          <button
-            onClick={handleStart}
-            className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
-            title="Start tracking"
-          >
-            <Play className="w-3 h-3" />
-          </button>
-        ) : (
-          <>
+      {/* Control Buttons - Hidden for completed tasks */}
+      {!task.completed && (
+        <div className="flex items-center space-x-1">
+          {!isTracking ? (
             <button
-              onClick={handlePause}
-              className="p-1 text-yellow-600 hover:bg-yellow-50 rounded transition-colors"
-              title="Pause tracking"
+              onClick={handleStart}
+              className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
+              title="Start tracking"
             >
-              <Pause className="w-3 h-3" />
+              <Play className="w-3 h-3" />
             </button>
-            <button
-              onClick={handleStop}
-              className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-              title="Stop tracking"
-            >
-              <Square className="w-3 h-3" />
-            </button>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <button
+                onClick={handlePause}
+                className="p-1 text-yellow-600 hover:bg-yellow-50 rounded transition-colors"
+                title="Pause tracking"
+              >
+                <Pause className="w-3 h-3" />
+              </button>
+              <button
+                onClick={handleStop}
+                className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                title="Stop tracking"
+              >
+                <Square className="w-3 h-3" />
+              </button>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };

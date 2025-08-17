@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Calendar, AlertCircle, Edit3, Clock, Tag, Copy } from 'lucide-react';
+import { Check, X, AlertCircle, Edit3, Clock, Tag, Flag } from 'lucide-react';
 import { Task } from '../types';
 import { getPriorityColor, formatDueDate } from '../utils/taskUtils';
 import TimeTracking from './TimeTracking';
+import { DatePicker } from './DatePicker';
 
 interface TaskItemProps {
   task: Task;
   onToggleComplete: (taskId: string) => void;
   onDelete: (taskId: string) => void;
   onUpdate: (taskId: string, updates: Partial<Task>) => void;
-  onDuplicate?: (taskId: string) => void;
+  onEditingChange?: (isEditing: boolean) => void;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ 
@@ -17,41 +18,57 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onToggleComplete, 
   onDelete, 
   onUpdate, 
-  onDuplicate,
+  onEditingChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
-  const [isCompleting, setIsCompleting] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
+  const [editTags, setEditTags] = useState<string[]>(task.tags || []);
+  const [editDueDate, setEditDueDate] = useState<Date | undefined>(task.dueDate);
+  const [editPriority, setEditPriority] = useState<Task['priority']>(task.priority);
+  const [newTag, setNewTag] = useState('');
+
+  // Notify parent component when editing state changes
+  useEffect(() => {
+    onEditingChange?.(isEditing);
+  }, [isEditing, onEditingChange]);
+
+  // Update local state when task prop changes
+  useEffect(() => {
+    if (!isEditing) {
+      setEditTitle(task.title);
+      setEditDescription(task.description || '');
+      setEditTags(task.tags || []);
+      setEditDueDate(task.dueDate);
+      setEditPriority(task.priority);
+    }
+  }, [task, isEditing]);
+
+  // Exit edit mode if task becomes completed
+  useEffect(() => {
+    if (task.completed && isEditing) {
+      setIsEditing(false);
+    }
+  }, [task.completed, isEditing]);
 
   const handleToggleComplete = () => {
-    if (!task.completed) {
-      // Starting completion animation
-      setIsCompleting(true);
-      setShowCelebration(true);
-      
-      // Complete the task after animation starts
-      setTimeout(() => {
-        onToggleComplete(task.id);
-      }, 200);
-      
-      // Hide celebration after animation
-      setTimeout(() => {
-        setShowCelebration(false);
-        setIsCompleting(false);
-      }, 1500);
-    } else {
-      // Uncompleting - no animation needed
-      onToggleComplete(task.id);
-    }
+    onToggleComplete(task.id);
   };
 
   const handleSave = () => {
+    // Don't allow saving if task is completed
+    if (task.completed) {
+      setIsEditing(false);
+      return;
+    }
+    
     if (editTitle.trim()) {
       onUpdate(task.id, {
         title: editTitle.trim(),
         description: editDescription.trim(),
+        tags: editTags,
+        dueDate: editDueDate,
+        priority: editPriority,
         updatedAt: new Date(),
       });
       setIsEditing(false);
@@ -61,6 +78,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const handleCancel = () => {
     setEditTitle(task.title);
     setEditDescription(task.description || '');
+    setEditTags(task.tags || []);
+    setEditDueDate(task.dueDate);
+    setEditPriority(task.priority);
+    setNewTag('');
     setIsEditing(false);
   };
 
@@ -90,10 +111,108 @@ const TaskItem: React.FC<TaskItemProps> = ({
           value={editDescription}
           onChange={(e) => setEditDescription(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="w-full text-xs text-gray-600 border-none outline-none resize-none p-2 rounded-lg bg-gray-50/70 focus:bg-white transition-colors focus-ring"
+          className="w-full text-xs text-gray-600 border-none outline-none resize-none p-2 rounded-lg bg-gray-50/70 focus:bg-white transition-colors focus-ring mb-2"
           placeholder="Add description..."
           rows={2}
         />
+        
+        {/* Priority */}
+        <div className="mb-2">
+          <label className="block text-xs font-semibold text-gray-700 mb-1">Priority</label>
+          <div className="flex space-x-2">
+            {(['low', 'medium', 'high'] as const).map((priority) => (
+              <button
+                key={priority}
+                type="button"
+                onClick={() => setEditPriority(priority)}
+                className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg border transition-all duration-200 ${
+                  editPriority === priority
+                    ? priority === 'high'
+                      ? 'bg-red-100 border-red-300 text-red-800 shadow-md'
+                      : priority === 'medium'
+                      ? 'bg-yellow-100 border-yellow-300 text-yellow-800 shadow-md'
+                      : 'bg-green-100 border-green-300 text-green-800 shadow-md'
+                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-1">
+                  <Flag className={`w-3 h-3 ${
+                    priority === 'high' ? 'text-red-500' :
+                    priority === 'medium' ? 'text-yellow-500' : 'text-green-500'
+                  }`} />
+                  <span className="capitalize">{priority}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Due Date */}
+        <div className="mb-2">
+          <label className="block text-xs font-semibold text-gray-700 mb-1">Due Date</label>
+          <DatePicker
+            value={editDueDate}
+            onChange={setEditDueDate}
+            placeholder="Select due date"
+            className="w-full"
+          />
+        </div>
+        
+        {/* Tags */}
+        <div className="mb-3">
+          <label className="block text-xs font-semibold text-gray-700 mb-1">Tags</label>
+          {editTags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2">
+              {editTags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full"
+                >
+                  <Tag className="w-2 h-2 mr-1" />
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => setEditTags(editTags.filter((_, i) => i !== index))}
+                    className="ml-1 hover:text-purple-900"
+                  >
+                    <X className="w-2 h-2" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newTag.trim()) {
+                  e.preventDefault();
+                  if (!editTags.includes(newTag.trim())) {
+                    setEditTags([...editTags, newTag.trim()]);
+                  }
+                  setNewTag('');
+                }
+              }}
+              placeholder="Add tag..."
+              className="flex-1 px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (newTag.trim() && !editTags.includes(newTag.trim())) {
+                  setEditTags([...editTags, newTag.trim()]);
+                  setNewTag('');
+                }
+              }}
+              className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+        
         <div className="flex justify-end space-x-2 mt-3">
           <button
             onClick={handleCancel}
@@ -113,55 +232,20 @@ const TaskItem: React.FC<TaskItemProps> = ({
   }
 
   return (
-    <div className={`group flex flex-col p-4 bg-white/60 backdrop-blur-sm rounded-xl border shadow-md hover:shadow-lg transition-all duration-500 hover:bg-white/80 hover-lift-subtle relative overflow-hidden ${
+    <div className={`group flex flex-col p-4 bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border shadow-md hover:shadow-lg transition-all duration-500 hover:bg-white/80 dark:hover:bg-gray-800/70 hover-lift-subtle relative overflow-hidden ${
       task.completed ? 'opacity-60 scale-95' : ''
-    } ${isOverdue ? 'border-red-200 bg-red-50/50' : 'border-gray-200/50'} ${
-      isCompleting ? 'animate-pulse scale-105' : ''
-    }`}>
-      
-      {/* Celebration Animation */}
-      {showCelebration && (
-        <>
-          {/* Confetti particles */}
-          <div className="absolute inset-0 pointer-events-none z-10">
-            {[...Array(12)].map((_, i) => (
-              <div
-                key={i}
-                className={`absolute w-2 h-2 rounded-full animate-bounce ${
-                  ['bg-yellow-400', 'bg-green-400', 'bg-blue-400', 'bg-purple-400', 'bg-pink-400', 'bg-red-400'][i % 6]
-                }`}
-                style={{
-                  left: `${20 + (i * 8)}%`,
-                  top: `${30 + (i % 3) * 20}%`,
-                  animationDelay: `${i * 50}ms`,
-                  animationDuration: '800ms',
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Success ripple effect */}
-          <div className="absolute inset-0 bg-green-400/20 rounded-xl animate-ping pointer-events-none z-5" />
-          
-          {/* Checkmark burst */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center animate-bounce shadow-2xl">
-              <Check className="w-8 h-8 text-white animate-pulse" />
-            </div>
-          </div>
-        </>
-      )}
+    } ${isOverdue ? 'border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-900/20' : 'border-gray-200/50 dark:border-gray-700/50'}`}>
 
       <div className="flex items-start space-x-3">
         <button
           onClick={handleToggleComplete}
           className={`flex-shrink-0 w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 mt-0.5 hover:shadow-md btn-animate transform hover:scale-110 ${
             task.completed
-              ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/30 animate-pulse'
+              ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/30'
               : 'border-gray-300 hover:border-green-400 hover:bg-green-50 hover:shadow-green-200'
-          } ${isCompleting ? 'animate-spin' : ''}`}
+          }`}
         >
-          {task.completed && <Check className={`w-3 h-3 ${isCompleting ? 'animate-bounce' : ''}`} />}
+          {task.completed && <Check className="w-3 h-3" />}
         </button>
         
         <div className="flex-1 min-w-0">
@@ -169,38 +253,32 @@ const TaskItem: React.FC<TaskItemProps> = ({
             <div className="flex-1 min-w-0">
               <h3 className={`text-sm font-medium transition-all duration-500 break-words ${
                 task.completed ? 'line-through text-gray-500 transform scale-95' : 'text-gray-900'
-              } ${isCompleting ? 'animate-pulse' : ''}`}>
+              }`}>
                 {task.title}
               </h3>
               {task.description && (
                 <p className={`text-xs mt-1 transition-all duration-500 break-words whitespace-pre-wrap ${
                   task.completed ? 'line-through text-gray-400 transform scale-95' : 'text-gray-600'
-                } ${isCompleting ? 'animate-pulse' : ''}`}>
+                }`}>
                   {task.description}
                 </p>
               )}
             </div>
             
             <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all duration-200 ml-2 flex-shrink-0">
-              {onDuplicate && (
+              {/* Only show edit button for incomplete tasks */}
+              {!task.completed && (
                 <button
-                  onClick={() => onDuplicate(task.id)}
-                  className="p-1.5 text-gray-400 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-all duration-200 btn-animate"
-                  title="Duplicate task"
+                  onClick={() => setIsEditing(true)}
+                  className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200 btn-animate"
+                  title="Edit task"
                 >
-                  <Copy className="w-3.5 h-3.5" />
+                  <Edit3 className="w-3.5 h-3.5" />
                 </button>
               )}
               <button
-                onClick={() => setIsEditing(true)}
-                className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all duration-200 btn-animate"
-                title="Edit task"
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-              </button>
-              <button
                 onClick={() => onDelete(task.id)}
-                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 btn-animate"
+                className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 btn-animate"
                 title="Delete task"
               >
                 <X className="w-3.5 h-3.5" />
@@ -211,7 +289,11 @@ const TaskItem: React.FC<TaskItemProps> = ({
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center space-x-2 flex-wrap">
               <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-all duration-200 ${getPriorityColor(task.priority)}`}>
-                {task.priority}
+                <Flag className={`w-3 h-3 mr-1 ${
+                  task.priority === 'high' ? 'text-red-600' :
+                  task.priority === 'medium' ? 'text-yellow-600' : 'text-green-600'
+                }`} />
+                <span className="capitalize">{task.priority}</span>
               </span>
               
               {task.dueDate && (

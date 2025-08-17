@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, X, Palette } from 'lucide-react';
+import { X, Palette } from 'lucide-react';
 import { getListColor } from '../utils/taskUtils';
 
 interface ListCreatorProps {
@@ -10,14 +10,18 @@ interface ListCreatorProps {
 const ListCreator: React.FC<ListCreatorProps> = ({ onCreateList, onCancel }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedColor, setSelectedColor] = useState('blue');
+  const [selectedColor, setSelectedColor] = useState('red');
 
-  const colors = ['blue', 'green', 'purple', 'red', 'yellow', 'indigo'];
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
       onCreateList(title.trim(), selectedColor, description.trim() || undefined);
+      // Reset form after successful creation
+      setTitle('');
+      setDescription('');
+      setSelectedColor('red');
     }
   };
 
@@ -83,7 +87,7 @@ const ListCreator: React.FC<ListCreatorProps> = ({ onCreateList, onCancel }) => 
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-3 text-sm text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+            className="flex-1 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700/60 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700/80 transition-colors"
           >
             Cancel
           </button>

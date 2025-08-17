@@ -7,7 +7,7 @@ import AddTaskInput from './AddTaskInput';
 
 interface TodoColumnProps {
   list: TodoList;
-  onAddTask: (listId: string, title: string, priority: Task['priority'], dueDate?: Date) => void;
+  onAddTask: (listId: string, title: string, priority: Task['priority'], dueDate?: Date, tags?: string[]) => void;
   onToggleTask: (listId: string, taskId: string) => void;
   onDeleteTask: (listId: string, taskId: string) => void;
   onUpdateTask: (listId: string, taskId: string, updates: Partial<Task>) => void;
@@ -42,13 +42,13 @@ const TodoColumn: React.FC<TodoColumnProps> = ({
               <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:shadow-md">
                 <ArrowUpDown className="w-4 h-4 transition-transform group-hover:scale-110" />
               </button>
-              <div className="absolute right-0 top-12 w-44 bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200/50 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out transform translate-y-2 group-hover:translate-y-0 z-20">
+              <div className="absolute right-0 top-12 w-44 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out transform translate-y-2 group-hover:translate-y-0 z-20">
                 {Object.entries(sortMethodLabels).map(([method, label]) => (
                   <button
                     key={method}
                     onClick={() => onUpdateList(list.id, { sortMethod: method as SortMethod })}
-                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 transition-all duration-200 ${
-                      list.sortMethod === method ? 'text-blue-600 bg-blue-50/70 font-medium' : 'text-gray-700'
+                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 ${
+                      list.sortMethod === method ? 'text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-900/30 font-medium' : 'text-gray-700 dark:text-white'
                     }`}
                   >
                     {label}
@@ -65,7 +65,7 @@ const TodoColumn: React.FC<TodoColumnProps> = ({
           <p className="text-sm text-gray-500">
             {activeTasks.length} active task{activeTasks.length !== 1 ? 's' : ''}
           </p>
-          <p className="text-xs text-gray-400 bg-gray-100/70 px-2 py-1 rounded-full">
+          <p className="text-xs text-gray-400 dark:text-white bg-gray-100/70 dark:bg-gray-700/70 px-2 py-1 rounded-full">
             {sortMethodLabels[list.sortMethod]}
           </p>
         </div>
@@ -119,7 +119,7 @@ const TodoColumn: React.FC<TodoColumnProps> = ({
         </div>
       )}
 
-      <AddTaskInput onAddTask={(title, priority, dueDate) => onAddTask(list.id, title, priority, dueDate)} />
+      <AddTaskInput onAddTask={(title, priority, dueDate, tags) => onAddTask(list.id, title, priority, dueDate, tags)} defaultPriority="medium" />
     </div>
   );
 };
