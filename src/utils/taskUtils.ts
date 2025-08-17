@@ -145,7 +145,7 @@ export const getListColor = (color: string): { bg: string; border: string; text:
     },
     yellow: {
       bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
+      border: '',
       text: 'text-yellow-800',
       accent: 'bg-yellow-500'
     },
