@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { TodoList, Task } from '../types';
+import { TodoList, Task, SortMethod } from '../types';
 import { sortTasks, getListColor } from '../utils/taskUtils';
 import DraggableTask from './DraggableTask';
 import AddTaskInput from './AddTaskInput';
 import { MoreVertical, ArrowUpDown, Trash2, CheckSquare, Share2 } from 'lucide-react';
-
-type SortMethod = 'smart' | 'priority' | 'dueDate' | 'manual';
 
 interface DroppableListProps {
   list: TodoList;
@@ -106,6 +104,10 @@ const DroppableList: React.FC<DroppableListProps> = ({
       blue: 'text-blue-400',
       purple: 'text-purple-400'
     };
+    // Handle migration from indigo to orange
+    if (color === 'indigo') {
+      return checkboxColors.orange;
+    }
     return checkboxColors[color] || 'text-red-400';
   };
 

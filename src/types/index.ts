@@ -1,3 +1,5 @@
+export type SortMethod = 'smart' | 'priority' | 'dueDate' | 'manual';
+
 export interface Task {
   id: string;
   title: string;

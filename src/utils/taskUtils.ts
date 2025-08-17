@@ -131,29 +131,17 @@ export const getPriorityColor = (priority: Task['priority']): string => {
 
 export const getListColor = (color: string): { bg: string; border: string; text: string; accent: string } => {
   const colors = {
-    blue: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
-      text: 'text-blue-800',
-      accent: 'bg-blue-500'
-    },
-    green: {
-      bg: 'bg-green-50',
-      border: 'border-green-200',
-      text: 'text-green-800',
-      accent: 'bg-green-500'
-    },
-    purple: {
-      bg: 'bg-purple-50',
-      border: 'border-purple-200',
-      text: 'text-purple-800',
-      accent: 'bg-purple-500'
-    },
     red: {
       bg: 'bg-red-50',
       border: 'border-red-200',
       text: 'text-red-800',
       accent: 'bg-red-500'
+    },
+    orange: {
+      bg: 'bg-orange-50',
+      border: 'border-orange-200',
+      text: 'text-orange-800',
+      accent: 'bg-orange-500'
     },
     yellow: {
       bg: 'bg-yellow-50',
@@ -161,13 +149,30 @@ export const getListColor = (color: string): { bg: string; border: string; text:
       text: 'text-yellow-800',
       accent: 'bg-yellow-500'
     },
-    indigo: {
-      bg: 'bg-indigo-50',
-      border: 'border-indigo-200',
-      text: 'text-indigo-800',
-      accent: 'bg-indigo-500'
+    green: {
+      bg: 'bg-green-50',
+      border: 'border-green-200',
+      text: 'text-green-800',
+      accent: 'bg-green-500'
+    },
+    blue: {
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
+      text: 'text-blue-800',
+      accent: 'bg-blue-500'
+    },
+    purple: {
+      bg: 'bg-purple-50',
+      border: 'border-purple-200',
+      text: 'text-purple-800',
+      accent: 'bg-purple-500'
     }
   };
+  
+  // Handle migration from indigo to orange
+  if (color === 'indigo') {
+    return colors.orange;
+  }
   
   return colors[color as keyof typeof colors] || colors.blue;
 };

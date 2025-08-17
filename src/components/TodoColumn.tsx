@@ -1,5 +1,5 @@
 import React from 'react';
-import { MoreVertical, ArrowUpDown } from 'lucide-react';
+import { MoreVertical, ArrowUpDown, CheckSquare } from 'lucide-react';
 import { TodoList, Task, SortMethod } from '../types';
 import { sortTasks } from '../utils/taskUtils';
 import TaskItem from './TaskItem';
