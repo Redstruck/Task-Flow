@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Data Generator - Delete Completed Tasks</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        .button.danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+        .button.secondary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+        }
+        #output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            min-height: 200px;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 TaskFlow Test Data Generator</h1>
+        <p>Generate test data to test the "Delete All Completed Tasks" functionality.</p>
+        
+        <div>
+            <button class="button" onclick="generateTestData()">Generate Test Data</button>
+            <button class="button secondary" onclick="openTaskFlow()">Open TaskFlow</button>
+            <button class="button danger" onclick="clearAllData()">Clear All Data</button>
+        </div>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const output = document.getElementById('output');
+            output.textContent += message + '\n';
+            console.log(message);
+        }
+
+        function generateTestData() {
+            const output = document.getElementById('output');
+            output.textContent = '';
+            
+            log('🧪 Creating test data for Delete All Completed Tasks feature...');
+
+            // Get existing lists or create default structure
+            const existingListsJson = localStorage.getItem('task-flow-lists');
+            let existingLists;
+
+            try {
+                existingLists = existingListsJson ? JSON.parse(existingListsJson) : [];
+            } catch (error) {
+                log('Error parsing existing lists, creating new ones: ' + error);
+                existingLists = [];
+            }
+
+            // Ensure we have at least 2 lists for testing
+            if (existingLists.length === 0) {
+                existingLists = [
+                    {
+                        id: `list-1-${Date.now()}`,
+                        title: 'Personal Tasks',
+                        description: 'My personal todo items',
+                        color: 'blue',
+                        tasks: [],
+                        sortMethod: 'smart',
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: `list-2-${Date.now() + 1}`,
+                        title: 'Work Projects',
+                        description: 'Work-related tasks',
+                        color: 'purple',
+                        tasks: [],
+                        sortMethod: 'priority',
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+            }
+
+            // Add test tasks with mixed completion status
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            // Test tasks for first list (Personal Tasks)
+            const personalTasks = [
+                {
+                    id: `task-personal-1-${Date.now()}`,
+                    title: 'Buy groceries',
+                    description: 'Get milk, eggs, and bread',
+                    completed: true,
+                    priority: 'medium',
+                    createdAt: yesterday.toISOString(),
+                    completedAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['shopping', 'personal'],
+                    subtasks: []
+                },
+                {
+                    id: `task-personal-2-${Date.now() + 1}`,
+                    title: 'Walk the dog',
+                    description: 'Evening walk in the park',
+                    completed: true,
+                    priority: 'low',
+                    createdAt: yesterday.toISOString(),
+                    completedAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['pets'],
+                    subtasks: []
+                },
+                {
+                    id: `task-personal-3-${Date.now() + 2}`,
+                    title: 'Call mom',
+                    description: 'Weekly check-in call',
+                    completed: false,
+                    priority: 'high',
+                    createdAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['family'],
+                    subtasks: []
+                },
+                {
+                    id: `task-personal-4-${Date.now() + 3}`,
+                    title: 'Read book chapter',
+                    description: 'Finish chapter 5',
+                    completed: true,
+                    priority: 'low',
+                    createdAt: yesterday.toISOString(),
+                    completedAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['reading', 'personal'],
+                    subtasks: []
+                }
+            ];
+
+            // Test tasks for second list (Work Projects)
+            const workTasks = [
+                {
+                    id: `task-work-1-${Date.now() + 10}`,
+                    title: 'Submit quarterly report',
+                    description: 'Q3 financial summary',
+                    completed: true,
+                    priority: 'high',
+                    createdAt: yesterday.toISOString(),
+                    completedAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['report', 'finance'],
+                    subtasks: []
+                },
+                {
+                    id: `task-work-2-${Date.now() + 11}`,
+                    title: 'Team standup meeting',
+                    description: 'Daily sync with the team',
+                    completed: true,
+                    priority: 'medium',
+                    createdAt: today.toISOString(),
+                    completedAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['meeting'],
+                    subtasks: []
+                },
+                {
+                    id: `task-work-3-${Date.now() + 12}`,
+                    title: 'Review pull requests',
+                    description: 'Code review for new features',
+                    completed: false,
+                    priority: 'medium',
+                    createdAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['development', 'code-review'],
+                    subtasks: []
+                },
+                {
+                    id: `task-work-4-${Date.now() + 13}`,
+                    title: 'Update documentation',
+                    description: 'API documentation updates',
+                    completed: true,
+                    priority: 'low',
+                    createdAt: yesterday.toISOString(),
+                    completedAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['documentation'],
+                    subtasks: []
+                },
+                {
+                    id: `task-work-5-${Date.now() + 14}`,
+                    title: 'Client presentation prep',
+                    description: 'Prepare slides for Monday meeting',
+                    completed: true,
+                    priority: 'high',
+                    createdAt: yesterday.toISOString(),
+                    completedAt: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                    tags: ['presentation', 'client'],
+                    subtasks: []
+                }
+            ];
+
+            // Add tasks to lists
+            existingLists[0].tasks = [...personalTasks];
+            existingLists[1].tasks = [...workTasks];
+
+            // Save to localStorage
+            localStorage.setItem('task-flow-lists', JSON.stringify(existingLists));
+
+            // Count completed tasks for confirmation
+            const completedCount = existingLists.reduce((total, list) => {
+                const completed = list.tasks.filter(task => task.completed).length;
+                log(`📋 ${list.title}: ${completed} completed tasks`);
+                return total + completed;
+            }, 0);
+
+            log(`✅ Test data created successfully!`);
+            log(`📊 Summary:`);
+            log(`   • Total lists: ${existingLists.length}`);
+            log(`   • Total completed tasks: ${completedCount}`);
+            log(`   • Total active tasks: ${existingLists.reduce((total, list) => total + list.tasks.filter(t => !t.completed).length, 0)}`);
+            log('');
+            log('🧪 Test the "Delete All Completed Tasks" feature:');
+            log('   1. Click "Open TaskFlow" button below');
+            log('   2. Click the Settings button (gear icon) in the header');
+            log('   3. Go to the "Data" tab');
+            log('   4. Click "Delete All Completed Tasks" button');
+            log('   5. Confirm the deletion in the dialog');
+            log('   6. Verify that only active tasks remain');
+            log('');
+            log('💡 Expected result: All ' + completedCount + ' completed tasks should be removed');
+        }
+
+        function openTaskFlow() {
+            window.open('http://localhost:5175/', '_blank');
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all TaskFlow data? This cannot be undone.')) {
+                const keys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.startsWith('task-flow-')) {
+                        keys.push(key);
+                    }
+                }
+                
+                keys.forEach(key => localStorage.removeItem(key));
+                
+                const output = document.getElementById('output');
+                output.textContent = `🧹 Cleared ${keys.length} TaskFlow data keys:\n${keys.join('\n')}`;
+                
+                log('✅ All TaskFlow data cleared successfully!');
+            }
+        }
+    </script>
+</body>
+</html>

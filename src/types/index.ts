@@ -281,7 +281,7 @@ export interface SearchFilters {
 }
 
 export interface AppSettings {
-  theme: 'light';
+  theme: 'light' | 'dark' | 'auto';
   notifications: NotificationSettings;
   keyboardShortcuts: boolean;
   autoSave: boolean;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -11,7 +11,7 @@ import {
   closestCenter,
 } from '@dnd-kit/core';
 import { SortableContext, arrayMove, horizontalListSortingStrategy } from '@dnd-kit/sortable';
-import { Plus, Users as UsersIcon, Calendar } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 import Header from './components/Header';
 import DraggableList from './components/DraggableList';
@@ -20,7 +20,6 @@ import TaskStats from './components/TaskStats';
 import TaskItem from './components/TaskItem';
 import TaskTemplates from './components/TaskTemplates';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
-import BulkActions from './components/BulkActions';
 import Analytics from './components/Analytics';
 import Settings from './components/Settings';
 import Collaboration from './components/Collaboration';
@@ -31,9 +30,9 @@ import { MobileNavigation, useMobileOptimization } from './components/MobileOpti
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { TodoList, Task, TaskTemplate, SearchFilters, AppSettings, Collaborator } from './types';
-import { createTask, createDefaultList, createList, createTemplate, createTaskFromTemplate, duplicateTask } from './utils/taskUtils';
+import { createTask, createDefaultList, createList, createTemplate, createTaskFromTemplate } from './utils/taskUtils';
 import { filterTasks, getAllTags } from './utils/searchUtils';
-import { exportData, importData, clearAllData, generateCSVReport } from './utils/exportUtils';
+import { exportData, importData, clearAllData } from './utils/exportUtils';
 
 const defaultSettings: AppSettings = {
   theme: 'light',
@@ -476,7 +475,6 @@ function App() {
           : list
       )
     );
-    setSelectedTasks(prev => prev.filter(id => id !== taskId));
   };
 
   const handleUpdateTask = (listId: string, taskId: string, updates: Partial<Task>) => {
@@ -487,21 +485,6 @@ function App() {
               ...list,
               tasks: list.tasks.map(task =>
                 task.id === taskId ? { ...task, ...updates, updatedAt: new Date() } : task
-              ),
-            }
-          : list
-      )
-    );
-  };
-
-  const handleDuplicateTask = (listId: string, taskId: string) => {
-    setLists(prevLists =>
-      prevLists.map(list =>
-        list.id === listId
-          ? {
-              ...list,
-              tasks: list.tasks.flatMap(task =>
-                task.id === taskId ? [task, duplicateTask(task)] : [task]
               ),
             }
           : list
@@ -550,26 +533,6 @@ function App() {
   // Bulk actions
   const handleBulkComplete = () => {
     // Bulk complete functionality can be implemented later if needed
-  };
-
-  const handleBulkDelete = () => {
-    // Bulk delete functionality can be implemented later if needed
-  };
-
-  const handleBulkArchive = () => {
-    // Bulk archive functionality can be implemented later if needed
-  };
-
-  const handleBulkTag = () => {
-    // Bulk tag functionality can be implemented later if needed
-  };
-
-  const handleBulkAssign = () => {
-    // Bulk assign functionality can be implemented later if needed
-  };
-
-  const handleBulkSetDueDate = () => {
-    // Bulk set due date functionality can be implemented later if needed
   };
 
   // Collaboration
@@ -656,6 +619,47 @@ function App() {
     }
   };
 
+  const handleDeleteAllCompletedTasks = () => {
+    // Count completed tasks across all lists for better user feedback
+    const taskCounts = lists.reduce((acc, list) => {
+      const completedTasks = list.tasks.filter(task => task.completed);
+      if (completedTasks.length > 0) {
+        acc.lists.push({ title: list.title, count: completedTasks.length });
+        acc.total += completedTasks.length;
+      }
+      return acc;
+    }, { lists: [] as Array<{ title: string; count: number }>, total: 0 });
+
+    if (taskCounts.total === 0) {
+      alert('No completed tasks found. All your tasks are still active!');
+      return;
+    }
+
+    // Create a detailed confirmation message
+    let confirmMessage = `You are about to delete ${taskCounts.total} completed task${taskCounts.total > 1 ? 's' : ''} from the following lists:\n\n`;
+    taskCounts.lists.forEach(list => {
+      confirmMessage += `• ${list.title}: ${list.count} task${list.count > 1 ? 's' : ''}\n`;
+    });
+    confirmMessage += `\nThis action cannot be undone. Are you sure you want to continue?`;
+
+    if (confirm(confirmMessage)) {
+      setLists(prevLists =>
+        prevLists.map(list => ({
+          ...list,
+          tasks: list.tasks.filter(task => !task.completed)
+        }))
+      );
+
+      // Show success notification if enabled
+      if (settings.notifications.enabled && settings.notifications.push && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification('✅ Completed Tasks Deleted', {
+          body: `Successfully removed ${taskCounts.total} completed task${taskCounts.total > 1 ? 's' : ''}`,
+          icon: '/favicon.ico'
+        });
+      }
+    }
+  };
+
   // Get sample collaborators for real-time collaboration
   const sampleCollaborators: Collaborator[] = [
     {
@@ -714,7 +718,7 @@ function App() {
           onShowTemplates={() => setShowTemplates(true)}
           onShowShortcuts={() => setShowShortcuts(true)}
           onShowAnalytics={() => setShowAnalytics(true)}
-          onShowCalendar={() => setShowCalendar(true)}
+          onShowEventCalendar={() => setShowCalendar(true)}
           onShowSettings={() => setShowSettings(true)}
         />
       )}
@@ -748,7 +752,6 @@ function App() {
                     onUpdateTask={handleUpdateTask}
                     onUpdateList={handleUpdateList}
                     onDeleteList={handleDeleteList}
-                    onDuplicateTask={handleDuplicateTask}
                     defaultPriority={settings.defaultPriority}
                   />
                 ))}
@@ -859,6 +862,7 @@ function App() {
           onExportData={handleExportData}
           onImportData={handleImportData}
           onClearData={handleClearData}
+          onDeleteAllCompletedTasks={handleDeleteAllCompletedTasks}
           isOpen={showSettings}
           onClose={() => setShowSettings(false)}
         />
