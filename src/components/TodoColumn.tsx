@@ -119,7 +119,7 @@ const TodoColumn: React.FC<TodoColumnProps> = ({
         </div>
       )}
 
-      <AddTaskInput onAddTask={(title, priority, dueDate, tags) => onAddTask(list.id, title, priority, dueDate, tags)} defaultPriority="medium" />
+      <AddTaskInput onAddTask={(title, priority, dueDate) => onAddTask(list.id, title, priority, dueDate)} defaultPriority="medium" />
     </div>
   );
 };

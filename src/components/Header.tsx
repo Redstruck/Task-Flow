@@ -6,7 +6,6 @@ import { SearchFilters } from '../types';
 interface HeaderProps {
   searchFilters: SearchFilters;
   onSearchFiltersChange: (filters: SearchFilters) => void;
-  allTags: string[];
   onShowTemplates: () => void;
   onShowShortcuts: () => void;
   onShowAnalytics: () => void;
@@ -17,7 +16,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   searchFilters,
   onSearchFiltersChange,
-  allTags,
   onShowTemplates,
   onShowShortcuts,
   onShowAnalytics,
@@ -46,7 +44,6 @@ const Header: React.FC<HeaderProps> = ({
           <SearchBar
             filters={searchFilters}
             onFiltersChange={onSearchFiltersChange}
-            allTags={allTags}
           />
         </div>
         

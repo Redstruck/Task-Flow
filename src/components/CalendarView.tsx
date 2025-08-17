@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, Flag, User, FileText, Tag } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, Flag, User, FileText } from 'lucide-react';
 import { Task, TodoList } from '../types';
 
 interface CalendarViewProps {
@@ -310,19 +310,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                             <div className="flex items-center space-x-2 text-xs text-gray-500">
                               <User className="w-3 h-3" />
                               <span>Assigned to: {task.assignee}</span>
-                            </div>
-                          )}
-                          
-                          {task.tags && task.tags.length > 0 && (
-                            <div className="flex items-center space-x-2 text-xs text-gray-500">
-                              <Tag className="w-3 h-3" />
-                              <div className="flex flex-wrap gap-1">
-                                {task.tags.map((tag, index) => (
-                                  <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
                             </div>
                           )}
                           

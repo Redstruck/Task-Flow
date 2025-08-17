@@ -9,7 +9,6 @@ export interface Task {
   dueDate?: Date;
   createdAt: Date;
   updatedAt: Date;
-  tags?: string[];
   subtasks?: Subtask[];
   estimatedTime?: number; // in minutes
   actualTime?: number; // in minutes
@@ -250,7 +249,6 @@ export interface TaskTemplate {
   description?: string;
   priority: Task['priority'];
   estimatedTime?: number;
-  tags?: string[];
   subtasks?: Omit<Subtask, 'id' | 'createdAt'>[];
   createdAt: Date;
   category?: string;
@@ -264,7 +262,6 @@ export interface SearchFilters {
   query: string;
   priority?: Task['priority'];
   completed?: boolean;
-  tags?: string[];
   dueDate?: 'today' | 'tomorrow' | 'week' | 'overdue';
   assignee?: string;
   dateRange?: {

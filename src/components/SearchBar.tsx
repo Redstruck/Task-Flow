@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Filter, X, Tag, Calendar, AlertCircle } from 'lucide-react';
+import { Search, Filter, X, Calendar, AlertCircle } from 'lucide-react';
 import { SearchFilters } from '../types';
 import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
 
 interface SearchBarProps {
   filters: SearchFilters;
   onFiltersChange: (filters: SearchFilters) => void;
-  allTags: string[];
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ filters, onFiltersChange, allTags }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ filters, onFiltersChange }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -42,14 +41,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ filters, onFiltersChange, allTags
       query: '',
       priority: undefined,
       completed: undefined,
-      tags: [],
       dueDate: undefined,
       assignee: undefined,
     });
   };
 
   const hasActiveFilters = filters.priority || filters.completed !== undefined || 
-    (filters.tags && filters.tags.length > 0) || filters.dueDate || filters.assignee;
+    filters.dueDate || filters.assignee;
 
   return (
     <div className="relative">
@@ -165,36 +163,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ filters, onFiltersChange, allTags
                 </button>
               </div>
             </div>
-
-            {allTags.length > 0 && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                  <Tag className="w-3 h-3 inline mr-1" />
-                  Tags
-                </label>
-                <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
-                  {allTags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => {
-                        const currentTags = filters.tags || [];
-                        const newTags = currentTags.includes(tag)
-                          ? currentTags.filter(t => t !== tag)
-                          : [...currentTags, tag];
-                        handleFilterChange('tags', newTags);
-                      }}
-                      className={`px-3 py-1 text-xs font-medium rounded-full border transition-all duration-200 hover:shadow-md ${
-                        filters.tags?.includes(tag)
-                          ? 'bg-purple-100 text-purple-800 border-purple-200'
-                          : 'text-gray-600 bg-white/70 border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

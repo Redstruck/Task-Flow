@@ -210,7 +210,6 @@ const testDataPersistenceFlow = () => {
     priority: 'medium',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    tags: ['test'],
     subtasks: []
   };
   

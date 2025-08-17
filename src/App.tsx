@@ -31,7 +31,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { TodoList, Task, TaskTemplate, SearchFilters, AppSettings, Collaborator } from './types';
 import { createTask, createDefaultList, createList, createTemplate, createTaskFromTemplate } from './utils/taskUtils';
-import { filterTasks, getAllTags } from './utils/searchUtils';
+import { filterTasks } from './utils/searchUtils';
 import { exportData, importData, clearAllData } from './utils/exportUtils';
 
 const defaultSettings: AppSettings = {
@@ -219,9 +219,8 @@ function App() {
     })
   );
 
-  // Get all tasks and tags for search
+  // Get all tasks for search
   const allTasks = useMemo(() => lists.flatMap(list => list.tasks), [lists]);
-  const allTags = useMemo(() => getAllTags(allTasks), [allTasks]);
 
   // Filter lists based on search and active list
   const filteredLists = useMemo(() => {
@@ -234,7 +233,7 @@ function App() {
     
     // Apply search filters
     if (!searchFilters.query && !searchFilters.priority && searchFilters.completed === undefined && 
-        (!searchFilters.tags || searchFilters.tags.length === 0) && !searchFilters.dueDate) {
+        !searchFilters.dueDate) {
       return listsToShow;
     }
 
@@ -714,7 +713,6 @@ function App() {
         <Header 
           searchFilters={searchFilters}
           onSearchFiltersChange={setSearchFilters}
-          allTags={allTags}
           onShowTemplates={() => setShowTemplates(true)}
           onShowShortcuts={() => setShowShortcuts(true)}
           onShowAnalytics={() => setShowAnalytics(true)}

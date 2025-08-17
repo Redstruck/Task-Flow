@@ -20,7 +20,6 @@ const addPriorityTestTasks = () => {
       dueDate: new Date(today.getTime() + (24 * 60 * 60 * 1000)).toISOString(), // Tomorrow
       createdAt: today.toISOString(),
       updatedAt: today.toISOString(),
-      tags: ['test', 'priority'],
       subtasks: [],
       estimatedTime: 60
     },
@@ -32,7 +31,6 @@ const addPriorityTestTasks = () => {
       priority: 'medium',
       createdAt: today.toISOString(),
       updatedAt: today.toISOString(),
-      tags: ['test'],
       subtasks: []
     },
     {
@@ -43,7 +41,6 @@ const addPriorityTestTasks = () => {
       priority: 'low',
       createdAt: today.toISOString(),
       updatedAt: today.toISOString(),
-      tags: ['test', 'ui'],
       subtasks: []
     }
   ];

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Plus, Flag, Sparkles, Tag, X } from 'lucide-react';
+import { Plus, Flag, Sparkles } from 'lucide-react';
 import { Task } from '../types';
 import { DatePicker } from './DatePicker';
 
 interface AddTaskInputProps {
-  onAddTask: (title: string, priority: Task['priority'], dueDate?: Date, tags?: string[]) => void;
+  onAddTask: (title: string, priority: Task['priority'], dueDate?: Date) => void;
   defaultPriority: Task['priority'];
 }
 
@@ -13,8 +13,6 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
   const [priority, setPriority] = useState<Task['priority']>(defaultPriority);
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [showOptions, setShowOptions] = useState(false);
-  const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState('');
 
   // Update priority when defaultPriority changes
   React.useEffect(() => {
@@ -24,11 +22,9 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
-      onAddTask(title.trim(), priority, dueDate, tags);
+      onAddTask(title.trim(), priority, dueDate);
       setTitle('');
       setDueDate(undefined);
-      setTags([]);
-      setNewTag('');
       // Reset to current default priority after creating task
       setPriority(defaultPriority);
       setShowOptions(false);
@@ -115,62 +111,6 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
                   placeholder="Select due date"
                   className="w-full"
                 />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Tags</label>
-              <div className="space-y-2">
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full"
-                      >
-                        <Tag className="w-2 h-2 mr-1" />
-                        {tag}
-                        <button
-                          type="button"
-                          onClick={() => setTags(tags.filter((_, i) => i !== index))}
-                          className="ml-1 hover:text-purple-900"
-                        >
-                          <X className="w-2 h-2" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newTag.trim()) {
-                        e.preventDefault();
-                        if (!tags.includes(newTag.trim())) {
-                          setTags([...tags, newTag.trim()]);
-                        }
-                        setNewTag('');
-                      }
-                    }}
-                    placeholder="Add tag..."
-                    className="flex-1 px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (newTag.trim() && !tags.includes(newTag.trim())) {
-                        setTags([...tags, newTag.trim()]);
-                        setNewTag('');
-                      }
-                    }}
-                    className="px-3 py-2 text-xs bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                  >
-                    Add
-                  </button>
-                </div>
               </div>
             </div>
           </div>

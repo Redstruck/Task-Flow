@@ -7,8 +7,7 @@ export const filterTasks = (tasks: Task[], filters: SearchFilters): Task[] => {
       const query = filters.query.toLowerCase();
       const searchableText = [
         task.title,
-        task.description || '',
-        ...(task.tags || [])
+        task.description || ''
       ].join(' ').toLowerCase();
       
       if (!searchableText.includes(query)) {
@@ -24,15 +23,6 @@ export const filterTasks = (tasks: Task[], filters: SearchFilters): Task[] => {
     // Completion status filter
     if (filters.completed !== undefined && task.completed !== filters.completed) {
       return false;
-    }
-
-    // Tags filter
-    if (filters.tags && filters.tags.length > 0) {
-      const taskTags = task.tags || [];
-      const hasMatchingTag = filters.tags.some(tag => taskTags.includes(tag));
-      if (!hasMatchingTag) {
-        return false;
-      }
     }
 
     // Due date filter
@@ -78,16 +68,6 @@ export const filterTasks = (tasks: Task[], filters: SearchFilters): Task[] => {
 
     return true;
   });
-};
-
-export const getAllTags = (tasks: Task[]): string[] => {
-  const tagSet = new Set<string>();
-  tasks.forEach(task => {
-    if (task.tags) {
-      task.tags.forEach(tag => tagSet.add(tag));
-    }
-  });
-  return Array.from(tagSet).sort();
 };
 
 export const highlightSearchTerm = (text: string, searchTerm: string): string => {

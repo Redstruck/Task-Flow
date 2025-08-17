@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, AlertCircle, Edit3, Clock, Tag, Flag } from 'lucide-react';
+import { Check, X, AlertCircle, Edit3, Clock, Flag } from 'lucide-react';
 import { Task } from '../types';
 import { getPriorityColor, formatDueDate } from '../utils/taskUtils';
 import TimeTracking from './TimeTracking';
@@ -23,10 +23,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const [editDescription, setEditDescription] = useState(task.description || '');
-  const [editTags, setEditTags] = useState<string[]>(task.tags || []);
   const [editDueDate, setEditDueDate] = useState<Date | undefined>(task.dueDate);
   const [editPriority, setEditPriority] = useState<Task['priority']>(task.priority);
-  const [newTag, setNewTag] = useState('');
 
   // Notify parent component when editing state changes
   useEffect(() => {
@@ -38,7 +36,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
     if (!isEditing) {
       setEditTitle(task.title);
       setEditDescription(task.description || '');
-      setEditTags(task.tags || []);
       setEditDueDate(task.dueDate);
       setEditPriority(task.priority);
     }
@@ -66,7 +63,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
       onUpdate(task.id, {
         title: editTitle.trim(),
         description: editDescription.trim(),
-        tags: editTags,
         dueDate: editDueDate,
         priority: editPriority,
         updatedAt: new Date(),
@@ -78,10 +74,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const handleCancel = () => {
     setEditTitle(task.title);
     setEditDescription(task.description || '');
-    setEditTags(task.tags || []);
     setEditDueDate(task.dueDate);
     setEditPriority(task.priority);
-    setNewTag('');
     setIsEditing(false);
   };
 
@@ -156,61 +150,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
             placeholder="Select due date"
             className="w-full"
           />
-        </div>
-        
-        {/* Tags */}
-        <div className="mb-3">
-          <label className="block text-xs font-semibold text-gray-700 mb-1">Tags</label>
-          {editTags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {editTags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full"
-                >
-                  <Tag className="w-2 h-2 mr-1" />
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => setEditTags(editTags.filter((_, i) => i !== index))}
-                    className="ml-1 hover:text-purple-900"
-                  >
-                    <X className="w-2 h-2" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-          <div className="flex space-x-2">
-            <input
-              type="text"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newTag.trim()) {
-                  e.preventDefault();
-                  if (!editTags.includes(newTag.trim())) {
-                    setEditTags([...editTags, newTag.trim()]);
-                  }
-                  setNewTag('');
-                }
-              }}
-              placeholder="Add tag..."
-              className="flex-1 px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                if (newTag.trim() && !editTags.includes(newTag.trim())) {
-                  setEditTags([...editTags, newTag.trim()]);
-                  setNewTag('');
-                }
-              }}
-              className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-            >
-              Add
-            </button>
-          </div>
         </div>
         
         <div className="flex justify-end space-x-2 mt-3">
@@ -302,23 +241,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 }`}>
                   {isOverdue ? <AlertCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                   <span>{formatDueDate(new Date(task.dueDate))}</span>
-                </div>
-              )}
-
-              {task.tags && task.tags.length > 0 && (
-                <div className="flex items-center space-x-1 flex-wrap">
-                  {task.tags.slice(0, 2).map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full transition-all duration-200 hover:bg-purple-200"
-                    >
-                      <Tag className="w-2 h-2 mr-1" />
-                      {tag}
-                    </span>
-                  ))}
-                  {task.tags.length > 2 && (
-                    <span className="text-xs text-gray-500">+{task.tags.length - 2}</span>
-                  )}
                 </div>
               )}
             </div>

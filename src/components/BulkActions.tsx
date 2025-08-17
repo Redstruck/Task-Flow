@@ -1,13 +1,11 @@
 import React from 'react';
-import { CheckSquare, Trash2, Archive, Tag, Calendar, User } from 'lucide-react';
-import { Task } from '../types';
+import { CheckSquare, Trash2, Archive, Calendar, User } from 'lucide-react';
 
 interface BulkActionsProps {
   selectedTasks: string[];
   onBulkComplete: () => void;
   onBulkDelete: () => void;
   onBulkArchive: () => void;
-  onBulkTag: () => void;
   onBulkAssign: () => void;
   onBulkSetDueDate: () => void;
   onClearSelection: () => void;
@@ -18,7 +16,6 @@ const BulkActions: React.FC<BulkActionsProps> = ({
   onBulkComplete,
   onBulkDelete,
   onBulkArchive,
-  onBulkTag,
   onBulkAssign,
   onBulkSetDueDate,
   onClearSelection,
@@ -46,14 +43,6 @@ const BulkActions: React.FC<BulkActionsProps> = ({
             title="Mark as complete"
           >
             <CheckSquare className="w-4 h-4" />
-          </button>
-          
-          <button
-            onClick={onBulkTag}
-            className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 hover:shadow-md"
-            title="Add tags"
-          >
-            <Tag className="w-4 h-4" />
           </button>
           
           <button

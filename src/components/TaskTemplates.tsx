@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookTemplate as Template, Plus, X, Clock, Tag, Star } from 'lucide-react';
+import { BookTemplate as Template, Plus, X, Clock, Star } from 'lucide-react';
 import { TaskTemplate, Task } from '../types';
 
 interface TaskTemplatesProps {
@@ -26,7 +26,6 @@ const TaskTemplates: React.FC<TaskTemplatesProps> = ({
     description: '',
     priority: 'medium' as Task['priority'],
     estimatedTime: '',
-    tags: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,7 +37,6 @@ const TaskTemplates: React.FC<TaskTemplatesProps> = ({
         description: formData.description.trim() || undefined,
         priority: formData.priority,
         estimatedTime: formData.estimatedTime ? parseInt(formData.estimatedTime) : undefined,
-        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(Boolean) : undefined,
         subtasks: [],
       });
       setFormData({
@@ -47,7 +45,6 @@ const TaskTemplates: React.FC<TaskTemplatesProps> = ({
         description: '',
         priority: 'medium',
         estimatedTime: '',
-        tags: '',
       });
       setShowCreateForm(false);
     }
@@ -123,7 +120,7 @@ const TaskTemplates: React.FC<TaskTemplatesProps> = ({
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
                     <select
@@ -143,16 +140,6 @@ const TaskTemplates: React.FC<TaskTemplatesProps> = ({
                       value={formData.estimatedTime}
                       onChange={(e) => setFormData({ ...formData, estimatedTime: e.target.value })}
                       placeholder="30"
-                      className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/70"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tags (comma-separated)</label>
-                    <input
-                      type="text"
-                      value={formData.tags}
-                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                      placeholder="work, review, weekly"
                       className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white/70"
                     />
                   </div>
@@ -219,25 +206,6 @@ const TaskTemplates: React.FC<TaskTemplatesProps> = ({
                     )}
                   </div>
                 </div>
-
-                {template.tags && template.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {template.tags.slice(0, 3).map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full flex items-center space-x-1"
-                      >
-                        <Tag className="w-2 h-2" />
-                        <span>{tag}</span>
-                      </span>
-                    ))}
-                    {template.tags.length > 3 && (
-                      <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-                        +{template.tags.length - 3}
-                      </span>
-                    )}
-                  </div>
-                )}
 
                 <button
                   onClick={() => onUseTemplate(template)}

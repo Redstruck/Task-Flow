@@ -335,7 +335,7 @@ const DroppableList: React.FC<DroppableListProps> = ({
       {/* Add Task Input - Always at bottom */}
       <div className="flex-shrink-0">
         <AddTaskInput 
-          onAddTask={(title, priority, dueDate, tags) => onAddTask(list.id, title, priority, dueDate, tags)}
+          onAddTask={(title, priority, dueDate) => onAddTask(list.id, title, priority, dueDate)}
           defaultPriority={defaultPriority}
         />
       </div>
