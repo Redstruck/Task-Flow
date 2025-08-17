@@ -60,11 +60,12 @@ App.tsx (Root Component)
   - Title and description
   - Priority levels (low, medium, high)
   - Due dates with date picker
-  - Tags for categorization
   - Subtasks support
   - Time tracking (estimated vs actual)
   - Comments and attachments
   - Dependencies and blockers
+
+*Note: Custom tags for categorization were removed in August 2025.*
 
 ### 2. List Management
 - **Multiple Lists**: Create unlimited task lists
@@ -88,14 +89,15 @@ App.tsx (Root Component)
 
 ### 4. Search and Filtering
 **Advanced Search Features**:
-- Text search across titles, descriptions, and tags
+- Text search across titles and descriptions
 - Priority filtering
 - Completion status filtering
 - Due date filters (today, tomorrow, week, overdue)
-- Tag-based filtering
 - Assignee filtering
 
 **Search Implementation**: Centralized in `searchUtils.ts` with filter composition
+
+*Note: Custom tag-based filtering was removed in August 2025 to simplify the user experience.*
 
 ### 5. Mobile Optimization
 **Responsive Design**:
@@ -142,7 +144,7 @@ App.tsx (Root Component)
 
 ## Recent Updates
 
-### August 2025 - List Color Theme Enhancement
+### August 2024 - List Color Theme Enhancement
 **Update**: Redesigned list color theming system for better visual organization and user experience.
 
 **Changes Made**:
@@ -160,6 +162,46 @@ App.tsx (Root Component)
 
 **Impact**: Improved visual hierarchy, better user experience in list organization, and maintained full backward compatibility.
 
+### August 2025 - Custom Tag System Removal
+**Update**: Completely removed the custom tag system to simplify the application and eliminate redundant tagging functionality.
+
+**Rationale**:
+- **Simplified UX**: Removed complexity from task creation and editing forms
+- **Reduced Clutter**: Eliminated purple tag badges that competed with priority and due date tags
+- **Focused Features**: Preserved built-in priority and due date tagging systems
+- **Cleaner UI**: Streamlined task cards and calendar views
+
+**Changes Made**:
+
+**Type System Updates**:
+- Removed `tags?: string[]` from `Task` interface
+- Removed `tags?: string[]` from `SearchFilters` interface  
+- Removed `tags?: string[]` from `TaskTemplate` interface
+
+**Component Updates**:
+- **TaskItem.tsx**: Removed tag editing and display functionality
+- **AddTaskInput.tsx**: Removed tag input fields and state management
+- **CalendarView.tsx**: Removed tag display from task details
+- **SearchBar.tsx**: Removed tag filtering and `allTags` parameter
+- **BulkActions.tsx**: Removed bulk tag operations
+- **TaskTemplates.tsx**: Removed tag functionality from templates
+- **Header.tsx**: Removed `allTags` prop passing
+
+**Core Logic Updates**:
+- **App.tsx**: Removed `getAllTags` usage and computation
+- **searchUtils.ts**: Removed `getAllTags` function and tag filtering logic
+- **Component Integration**: Updated all AddTaskInput usage to exclude tags
+
+**Test Data Cleanup**:
+- Cleaned tag references from test files
+- Updated mock data to exclude tag properties
+
+**Preserved Features**:
+- ✅ Priority tags (Low/Medium/High with colored styling)  
+- ✅ Due date tags (with calendar icons and overdue indicators)
+- ✅ All core task management functionality
+- ✅ Search and filtering (excluding tag-based filtering)
+
 ## Data Models
 
 ### Core Types
@@ -175,7 +217,6 @@ interface Task {
   dueDate?: Date;
   createdAt: Date;
   updatedAt: Date;
-  tags?: string[];
   subtasks?: Subtask[];
   estimatedTime?: number;
   actualTime?: number;
@@ -225,8 +266,8 @@ interface AppSettings {
 
 ### Search Utilities (`searchUtils.ts`)
 - **Filter Composition**: Complex search filter logic
-- **Tag Extraction**: Automatic tag discovery
 - **Search Highlighting**: Visual search result enhancement
+- **Task Filtering**: Priority, completion status, and due date filtering
 
 ### Export Utilities (`exportUtils.ts`)
 - **Data Export**: JSON and CSV export functionality
