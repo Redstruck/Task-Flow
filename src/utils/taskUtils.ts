@@ -199,7 +199,7 @@ export const formatDueDate = (date: Date): string => {
 };
 
 export const getTaskStats = (tasks: Task[]) => {
-  const total = tasks.length;
+  const total = tasks.filter(task => !task.completed).length;
   const completed = tasks.filter(task => task.completed).length;
   const overdue = tasks.filter(task => 
     task.dueDate && 
