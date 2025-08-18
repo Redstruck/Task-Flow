@@ -1074,3 +1074,18 @@
   color: #4b5563; /* text-gray-600 */
   opacity: 1;
 }
+
+/* Calendar modal - ensure it's always above all other elements */
+.calendar-modal-overlay {
+  z-index: 1100 !important;
+  position: fixed !important;
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+.calendar-modal-content {
+  z-index: 1101 !important;
+  position: relative !important;
+  transform: translateZ(0);
+  isolation: isolate;
+}

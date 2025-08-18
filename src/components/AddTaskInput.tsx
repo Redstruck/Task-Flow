@@ -55,8 +55,8 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4">
-      <div className="space-y-3">
+    <form onSubmit={handleSubmit} className="mt-4 relative">
+      <div className="space-y-3 relative">
         <div className="flex items-center space-x-2">
           <div className="flex-1 relative">
             <input
@@ -80,10 +80,10 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
           </button>
         </div>
 
-        <div className={`transition-all duration-300 ease-out ${
+        <div className={`relative z-20 transition-all duration-300 ease-out ${
           showOptions ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
         }`}>
-          <div className="p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-gray-200/50 space-y-4 shadow-lg">
+          <div className="p-6 bg-white border border-gray-200 rounded-xl space-y-6 shadow-xl mt-2 backdrop-blur-none">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Priority</label>
               <div className="flex space-x-2">
@@ -104,7 +104,7 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-3 uppercase tracking-wide">Due Date</label>
-              <div className="relative overflow-visible">
+              <div className="relative z-30 overflow-visible">
                 <DatePicker
                   value={dueDate}
                   onChange={setDueDate}

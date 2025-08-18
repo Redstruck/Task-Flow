@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, User, FileText } from 'lucide-react';
 import { Task, TodoList } from '../types';
 
@@ -31,6 +32,26 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
 
   // Get all tasks with their list information
   const allTasksWithList = useMemo(() => {
@@ -101,9 +122,20 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-7xl max-h-[90vh] overflow-hidden animate-in slide-in-from-top-2 duration-300">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 calendar-modal-overlay"
+      onClick={(e) => {
+        // Close modal when clicking on backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-7xl max-h-[90vh] overflow-hidden animate-in slide-in-from-top-2 duration-300 calendar-modal-content"
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3">
@@ -338,6 +370,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
     </div>
   );
+
+  // Use createPortal to render the modal directly to document.body
+  // This ensures it's never blocked by any container restrictions
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };
 
 export default CalendarView;
