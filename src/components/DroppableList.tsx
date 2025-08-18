@@ -41,6 +41,7 @@ const DroppableList: React.FC<DroppableListProps> = ({
   // State for dropdown menus
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Refs for dropdown menus
   const sortMenuRef = useRef<HTMLDivElement>(null);
@@ -128,8 +129,13 @@ const DroppableList: React.FC<DroppableListProps> = ({
   };
 
   const handleDeleteList = () => {
-    onDeleteList(list.id);
+    setIsDeleting(true);
     setShowMoreMenu(false); // Close dropdown after action
+    
+    // Add a delay for the deletion animation
+    setTimeout(() => {
+      onDeleteList(list.id);
+    }, 600);
   };
 
   return (
@@ -139,7 +145,7 @@ const DroppableList: React.FC<DroppableListProps> = ({
         showListDropZone ? 'ring-2 ring-blue-500/50 bg-blue-50/30 border-blue-300' : ''
       } ${
         activeTasks.length === 0 && completedTasks.length === 0 ? 'h-[400px]' : ''
-      }`}
+      } ${isDeleting ? 'list-deleting' : ''}`}
     >
       {/* List Header */}
       <div className="mb-6 flex-shrink-0">

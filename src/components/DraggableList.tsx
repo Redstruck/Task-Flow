@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
@@ -30,6 +30,16 @@ const DraggableList: React.FC<DraggableListProps> = ({
   onDeleteList,
   defaultPriority,
 }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteList = (listId: string) => {
+    setIsDeleting(true);
+    
+    // Add a delay for the deletion animation
+    setTimeout(() => {
+      onDeleteList(listId);
+    }, 600);
+  };
   const {
     attributes,
     listeners,
@@ -64,7 +74,7 @@ const DraggableList: React.FC<DraggableListProps> = ({
         isOver && !isDragging 
           ? 'scale-102 shadow-xl' 
           : ''
-      }`}
+      } ${isDeleting ? 'list-deleting' : ''}`}
     >
       {/* List Drag Handle */}
       <div
@@ -97,7 +107,7 @@ const DraggableList: React.FC<DraggableListProps> = ({
           onDeleteTask={onDeleteTask}
           onUpdateTask={onUpdateTask}
           onUpdateList={onUpdateList}
-          onDeleteList={onDeleteList}
+          onDeleteList={handleDeleteList}
           defaultPriority={defaultPriority}
         />
       </div>

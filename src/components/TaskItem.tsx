@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, AlertCircle, Edit3, Clock } from 'lucide-react';
+import { Check, AlertCircle, Edit3, Clock, Trash2 } from 'lucide-react';
 import { Task } from '../types';
 import { getPriorityColor, formatDueDate } from '../utils/taskUtils';
 import TimeTracking from './TimeTracking';
@@ -25,6 +25,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const [editDescription, setEditDescription] = useState(task.description || '');
   const [editDueDate, setEditDueDate] = useState<Date | undefined>(task.dueDate);
   const [editPriority, setEditPriority] = useState<Task['priority']>(task.priority);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [isUncompleting, setIsUncompleting] = useState(false);
 
   // Notify parent component when editing state changes
   useEffect(() => {
@@ -49,7 +53,38 @@ const TaskItem: React.FC<TaskItemProps> = ({
   }, [task.completed, isEditing]);
 
   const handleToggleComplete = () => {
-    onToggleComplete(task.id);
+    if (task.completed) {
+      // Task is being uncompleted
+      setIsUncompleting(true);
+      setTimeout(() => {
+        onToggleComplete(task.id);
+        setIsUncompleting(false);
+      }, 300);
+    } else {
+      // Task is being completed
+      setIsCompleting(true);
+      
+      // Show celebration for high priority tasks
+      if (task.priority === 'high') {
+        setShowCelebration(true);
+        setTimeout(() => setShowCelebration(false), 2000);
+      }
+      
+      // Add a small delay for the animation to show
+      setTimeout(() => {
+        onToggleComplete(task.id);
+        setIsCompleting(false);
+      }, 300);
+    }
+  };
+
+  const handleDelete = () => {
+    setIsDeleting(true);
+    
+    // Add a delay for the deletion animation
+    setTimeout(() => {
+      onDelete(task.id);
+    }, 500);
   };
 
   const handleSave = () => {
@@ -167,20 +202,24 @@ const TaskItem: React.FC<TaskItemProps> = ({
   }
 
   return (
-    <div className={`group flex flex-col p-4 bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border shadow-md hover:shadow-lg transition-all duration-500 hover:bg-white/80 dark:hover:bg-gray-800/70 hover-lift-subtle relative overflow-hidden ${
-      task.completed ? 'opacity-60 scale-95' : ''
-    } ${isOverdue ? 'border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-900/20' : 'border-gray-200/50 dark:border-gray-700/50'}`}>
+    <div className={`task-item group flex flex-col p-4 bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border shadow-md hover:shadow-lg transition-all duration-500 hover:bg-white/80 dark:hover:bg-gray-800/70 hover-lift-subtle relative overflow-hidden ${
+      task.completed ? 'opacity-60 scale-95 completed' : ''
+    } ${isCompleting ? `task-completing ${task.priority}-priority-completing` : ''} ${
+      isUncompleting ? 'task-uncompleting' : ''
+    } ${isDeleting ? 'task-deleting' : ''} ${showCelebration ? 'sparkle-effect' : ''} ${isOverdue ? 'border-red-200 dark:border-red-800/50 bg-red-50/50 dark:bg-red-900/20' : 'border-gray-200/50 dark:border-gray-700/50'}`}>
 
       <div className="flex items-start space-x-3">
         <button
           onClick={handleToggleComplete}
           className={`flex-shrink-0 w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 mt-0.5 hover:shadow-md btn-animate transform hover:scale-110 ${
             task.completed
-              ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/30'
+              ? `bg-gradient-to-r from-green-500 to-emerald-500 border-green-500 text-white shadow-lg shadow-green-500/30 completion-glow ${task.priority}-priority`
               : 'border-gray-300 hover:border-green-400 hover:bg-green-50 hover:shadow-green-200'
+          } ${isCompleting ? `completion-glow ${task.priority}-priority` : ''} ${
+            isUncompleting ? 'checkbox-uncompleting' : ''
           }`}
         >
-          {task.completed && <Check className="w-3 h-3" />}
+          {task.completed && <Check className={`w-3 h-3 ${isCompleting ? 'checkmark-pop' : ''}`} />}
         </button>
         
         <div className="flex-1 min-w-0">
@@ -212,11 +251,11 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 </button>
               )}
               <button
-                onClick={() => onDelete(task.id)}
-                className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 btn-animate"
+                onClick={handleDelete}
+                className={`p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 btn-animate ${isDeleting ? 'delete-shake' : ''}`}
                 title="Delete task"
               >
-                <X className="w-3.5 h-3.5" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>

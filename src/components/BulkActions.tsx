@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CheckSquare, Trash2, Archive, Calendar, User } from 'lucide-react';
 
 interface BulkActionsProps {
@@ -20,6 +20,17 @@ const BulkActions: React.FC<BulkActionsProps> = ({
   onBulkSetDueDate,
   onClearSelection,
 }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleBulkDelete = () => {
+    setIsDeleting(true);
+    
+    // Add a delay for the deletion animation
+    setTimeout(() => {
+      onBulkDelete();
+      setIsDeleting(false);
+    }, 300);
+  };
   if (selectedTasks.length === 0) return null;
 
   return (
@@ -70,9 +81,10 @@ const BulkActions: React.FC<BulkActionsProps> = ({
           </button>
           
           <button
-            onClick={onBulkDelete}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md"
+            onClick={handleBulkDelete}
+            className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md ${isDeleting ? 'delete-shake' : ''}`}
             title="Delete"
+            disabled={isDeleting}
           >
             <Trash2 className="w-4 h-4" />
           </button>
