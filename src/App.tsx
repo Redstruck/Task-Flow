@@ -128,7 +128,7 @@ function App() {
   // Enhanced localStorage with auto-save and backup
   const [lists, setLists] = useLocalStorage<TodoList[]>('task-flow-lists', [createDefaultList()]);
   const [templates, setTemplates] = useLocalStorage<TaskTemplate[]>('task-flow-templates', []);
-  const [settings, setSettings] = useLocalStorage<AppSettings>('task-flow-settings', defaultSettings);
+  const [settings, setSettings] = useLocalStorage<AppSettings>('task-flow-settings', defaultSettings, true);
   
   // Additional persisted state for better user experience
   // const [calendarEvents, setCalendarEvents] = useLocalStorage<CalendarEvent[]>('task-flow-calendar-events', []);
