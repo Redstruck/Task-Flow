@@ -28,6 +28,13 @@ export function useLocalStorage<T>(key: string, initialValue: T, useDeepMerge: b
       const item = window.localStorage.getItem(key);
       if (item) {
         const parsed = JSON.parse(item);
+        
+        // Check if parsed value is null or undefined
+        if (parsed === null || parsed === undefined) {
+          console.log(`🆕 Parsed value is null for ${key}, using default value`);
+          return initialValue;
+        }
+        
         console.log(`📖 Loaded ${key}:`, Array.isArray(parsed) ? `${parsed.length} items` : 'data loaded');
         
         // Use deep merge for settings to ensure all nested properties exist
@@ -48,6 +55,12 @@ export function useLocalStorage<T>(key: string, initialValue: T, useDeepMerge: b
         if (backup) {
           console.log(`🔄 Attempting recovery from backup for "${key}"`);
           const parsed = JSON.parse(backup);
+          
+          // Check if backup parsed value is null or undefined
+          if (parsed === null || parsed === undefined) {
+            console.log(`🆕 Backup parsed value is null for ${key}, using default value`);
+            return initialValue;
+          }
           
           // Use deep merge for settings backup recovery too
           if (useDeepMerge && key === 'task-flow-settings') {
