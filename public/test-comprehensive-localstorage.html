@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow LocalStorage Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section { 
+            background: white;
+            margin: 20px 0; 
+            padding: 20px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result { 
+            margin: 10px 0; 
+            padding: 10px; 
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .clear-btn { background: #dc3545; }
+        .clear-btn:hover { background: #c82333; }
+        .stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        pre { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 4px; 
+            overflow-x: auto;
+            max-height: 400px;
+        }
+        .json-key { color: #0451a5; }
+        .json-string { color: #0a3069; }
+        .json-number { color: #1976d2; }
+    </style>
+</head>
+<body>
+    <h1>🗂️ TaskFlow LocalStorage Test Suite</h1>
+    <p>This page tests the comprehensive localStorage implementation for TaskFlow.</p>
+
+    <div class="test-section">
+        <h2>📊 Storage Statistics</h2>
+        <div class="stats" id="stats"></div>
+        <button onclick="updateStats()">🔄 Refresh Stats</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Operations</h2>
+        <button onclick="testCreateSampleData()">📝 Create Sample Data</button>
+        <button onclick="testDataPersistence()">💾 Test Persistence</button>
+        <button onclick="testBackupRestore()">🔄 Test Backup/Restore</button>
+        <button onclick="testAutoSave()">⚡ Test Auto-Save</button>
+        <button onclick="exportAllData()">📤 Export Data</button>
+        <button onclick="clearAllData()" class="clear-btn">🗑️ Clear All Data</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Current Storage Contents</h2>
+        <button onclick="viewStorageContents()">👀 View All Data</button>
+        <pre id="storage-contents"></pre>
+    </div>
+
+    <script>
+        // Test utilities
+        const STORAGE_KEYS = {
+            LISTS: 'task-flow-lists',
+            TEMPLATES: 'task-flow-templates',
+            SETTINGS: 'task-flow-settings',
+            CALENDAR_EVENTS: 'task-flow-calendar-events',
+            LAST_ACTIVE_LIST: 'task-flow-last-active-list',
+            SEARCH_FILTERS: 'task-flow-search-filters',
+        };
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            stats.innerHTML = '';
+
+            let totalSize = 0;
+            let itemCount = 0;
+            const breakdown = {};
+
+            Object.values(STORAGE_KEYS).forEach(key => {
+                const data = localStorage.getItem(key);
+                if (data) {
+                    const size = data.length;
+                    totalSize += size;
+                    itemCount++;
+                    breakdown[key] = size;
+                }
+            });
+
+            const formatBytes = (bytes) => {
+                if (bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            };
+
+            stats.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${itemCount}</div>
+                    <div>Stored Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${formatBytes(totalSize)}</div>
+                    <div>Total Size</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${Object.keys(breakdown).length}</div>
+                    <div>Active Keys</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${Math.round((totalSize / (1024 * 1024 * 5)) * 100)}%</div>
+                    <div>Storage Used (5MB limit)</div>
+                </div>
+            `;
+
+            addResult(`Storage stats updated: ${itemCount} items, ${formatBytes(totalSize)} total`, 'success');
+        }
+
+        function testCreateSampleData() {
+            try {
+                // Create sample lists
+                const sampleLists = [
+                    {
+                        id: 'list-1',
+                        title: 'Work Tasks',
+                        description: 'Professional responsibilities',
+                        color: 'blue',
+                        createdAt: new Date().toISOString(),
+                        tasks: [
+                            {
+                                id: 'task-1',
+                                title: 'Review quarterly reports',
+                                description: 'Analyze Q3 performance metrics',
+                                completed: false,
+                                priority: 'high',
+                                dueDate: new Date(Date.now() + 86400000 * 7).toISOString(),
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString()
+                            },
+                            {
+                                id: 'task-2',
+                                title: 'Team meeting preparation',
+                                description: 'Prepare slides for Monday meeting',
+                                completed: true,
+                                priority: 'medium',
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString(),
+                                completedAt: new Date().toISOString()
+                            }
+                        ]
+                    },
+                    {
+                        id: 'list-2',
+                        title: 'Personal Projects',
+                        description: 'Side projects and learning',
+                        color: 'green',
+                        createdAt: new Date().toISOString(),
+                        tasks: [
+                            {
+                                id: 'task-3',
+                                title: 'Learn TypeScript',
+                                description: 'Complete advanced TypeScript course',
+                                completed: false,
+                                priority: 'low',
+                                dueDate: new Date(Date.now() + 86400000 * 14).toISOString(),
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString()
+                            }
+                        ]
+                    }
+                ];
+
+                // Create sample templates
+                const sampleTemplates = [
+                    {
+                        id: 'template-1',
+                        title: 'Daily Standup Prep',
+                        description: 'Template for preparing daily standup updates',
+                        priority: 'medium',
+                        category: 'work',
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+
+                // Create sample settings
+                const sampleSettings = {
+                    theme: 'light',
+                    notifications: {
+                        enabled: true,
+                        email: false,
+                        push: true,
+                        dueDateReminders: true,
+                        dailyDigest: false
+                    },
+                    keyboardShortcuts: true,
+                    autoSave: true,
+                    defaultPriority: 'medium',
+                    timeFormat: '12h',
+                    dateFormat: 'MM/DD/YYYY',
+                    weekStart: 'monday'
+                };
+
+                // Sample search filters
+                const sampleSearchFilters = {
+                    query: '',
+                    priority: 'high',
+                    completed: false,
+                    dueDate: 'week'
+                };
+
+                // Save sample data
+                localStorage.setItem(STORAGE_KEYS.LISTS, JSON.stringify(sampleLists));
+                localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(sampleTemplates));
+                localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(sampleSettings));
+                localStorage.setItem(STORAGE_KEYS.SEARCH_FILTERS, JSON.stringify(sampleSearchFilters));
+                localStorage.setItem(STORAGE_KEYS.LAST_ACTIVE_LIST, JSON.stringify('list-1'));
+
+                addResult('✅ Sample data created successfully!', 'success');
+                addResult(`Created: ${sampleLists.length} lists with ${sampleLists.reduce((acc, list) => acc + list.tasks.length, 0)} total tasks`, 'info');
+                updateStats();
+            } catch (error) {
+                addResult(`❌ Error creating sample data: ${error.message}`, 'error');
+            }
+        }
+
+        function testDataPersistence() {
+            try {
+                const testKey = 'task-flow-test-persistence';
+                const testData = {
+                    timestamp: new Date().toISOString(),
+                    data: 'persistence test',
+                    number: Math.random()
+                };
+
+                // Write data
+                localStorage.setItem(testKey, JSON.stringify(testData));
+                
+                // Read data immediately
+                const retrieved = JSON.parse(localStorage.getItem(testKey));
+                
+                if (JSON.stringify(testData) === JSON.stringify(retrieved)) {
+                    addResult('✅ Data persistence test passed', 'success');
+                } else {
+                    addResult('❌ Data persistence test failed - data mismatch', 'error');
+                }
+
+                // Cleanup
+                localStorage.removeItem(testKey);
+            } catch (error) {
+                addResult(`❌ Persistence test error: ${error.message}`, 'error');
+            }
+        }
+
+        function testBackupRestore() {
+            try {
+                const testKey = 'task-flow-test-backup';
+                const backupKey = `${testKey}-backup`;
+                const originalData = { test: 'backup data', timestamp: Date.now() };
+
+                // Create original data
+                localStorage.setItem(testKey, JSON.stringify(originalData));
+                
+                // Create backup
+                const data = localStorage.getItem(testKey);
+                localStorage.setItem(backupKey, data);
+                
+                // Simulate data corruption
+                localStorage.setItem(testKey, 'corrupted');
+                
+                // Restore from backup
+                const backupData = localStorage.getItem(backupKey);
+                localStorage.setItem(testKey, backupData);
+                
+                // Verify restoration
+                const restored = JSON.parse(localStorage.getItem(testKey));
+                
+                if (JSON.stringify(originalData) === JSON.stringify(restored)) {
+                    addResult('✅ Backup/restore test passed', 'success');
+                } else {
+                    addResult('❌ Backup/restore test failed', 'error');
+                }
+
+                // Cleanup
+                localStorage.removeItem(testKey);
+                localStorage.removeItem(backupKey);
+            } catch (error) {
+                addResult(`❌ Backup/restore test error: ${error.message}`, 'error');
+            }
+        }
+
+        function testAutoSave() {
+            addResult('⚡ Auto-save is handled by the useLocalStorage hook in the React app', 'info');
+            addResult('💡 To test auto-save: Make changes in the app and refresh the page', 'info');
+            
+            // Test debounced saving simulation
+            let saveCount = 0;
+            const simulateAutoSave = () => {
+                saveCount++;
+                addResult(`🔄 Simulated auto-save #${saveCount}`, 'info');
+            };
+
+            // Simulate multiple rapid changes
+            for (let i = 0; i < 3; i++) {
+                setTimeout(simulateAutoSave, i * 100);
+            }
+        }
+
+        function exportAllData() {
+            try {
+                const exportData = {};
+                Object.entries(STORAGE_KEYS).forEach(([key, storageKey]) => {
+                    const data = localStorage.getItem(storageKey);
+                    if (data) {
+                        exportData[key] = JSON.parse(data);
+                    }
+                });
+
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                    type: 'application/json'
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `taskflow-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                addResult('✅ Data exported successfully!', 'success');
+            } catch (error) {
+                addResult(`❌ Export error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear ALL TaskFlow data? This cannot be undone!')) {
+                try {
+                    let clearedCount = 0;
+                    Object.values(STORAGE_KEYS).forEach(key => {
+                        if (localStorage.getItem(key)) {
+                            localStorage.removeItem(key);
+                            localStorage.removeItem(`${key}-backup`);
+                            clearedCount++;
+                        }
+                    });
+
+                    addResult(`🗑️ Cleared ${clearedCount} storage items`, 'success');
+                    updateStats();
+                    document.getElementById('storage-contents').textContent = '';
+                } catch (error) {
+                    addResult(`❌ Clear error: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function viewStorageContents() {
+            try {
+                const contents = {};
+                Object.entries(STORAGE_KEYS).forEach(([key, storageKey]) => {
+                    const data = localStorage.getItem(storageKey);
+                    if (data) {
+                        try {
+                            contents[key] = JSON.parse(data);
+                        } catch (e) {
+                            contents[key] = data; // Raw string if not JSON
+                        }
+                    }
+                });
+
+                document.getElementById('storage-contents').textContent = 
+                    JSON.stringify(contents, null, 2);
+                
+                addResult(`📋 Displaying ${Object.keys(contents).length} storage items`, 'info');
+            } catch (error) {
+                addResult(`❌ View error: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateStats();
+            addResult('🚀 LocalStorage test suite initialized', 'success');
+            
+            // Listen for storage changes
+            window.addEventListener('storage', (e) => {
+                if (e.key && e.key.startsWith('task-flow-')) {
+                    addResult(`🔄 Storage change detected: ${e.key}`, 'info');
+                    updateStats();
+                }
+            });
+
+            // Listen for custom TaskFlow events
+            window.addEventListener('taskflow-data-saved', (e) => {
+                addResult(`💾 TaskFlow data saved: ${e.detail.keys?.join(', ')}`, 'success');
+                updateStats();
+            });
+        });
+    </script>
+</body>
+</html>

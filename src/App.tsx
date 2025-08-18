@@ -27,12 +27,13 @@ import RealTimeCollaboration from './components/RealTimeCollaboration';
 import CalendarView from './components/CalendarView';
 import DragPreview from './components/DragPreview';
 import { MobileNavigation, useMobileOptimization } from './components/MobileOptimization';
-import { useLocalStorage } from './hooks/useLocalStorage';
+import { useLocalStorage } from './hooks/useLocalStorage.enhanced';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { TodoList, Task, TaskTemplate, SearchFilters, AppSettings, Collaborator } from './types';
 import { createTask, createDefaultList, createList, createTemplate, createTaskFromTemplate } from './utils/taskUtils';
 import { filterTasks } from './utils/searchUtils';
-import { exportData, importData, clearAllData } from './utils/exportUtils';
+import { exportData, importData } from './utils/exportUtils';
+import { saveToLocalStorage, loadFromLocalStorage, clearAllLocalStorage, createBackup } from './utils/localStorageUtils';
 
 const defaultSettings: AppSettings = {
   theme: 'light',
@@ -124,9 +125,23 @@ const defaultSettings: AppSettings = {
 };
 
 function App() {
-  const [lists, setLists] = useLocalStorage<TodoList[]>('todo-lists', [createDefaultList()]);
-  const [templates, setTemplates] = useLocalStorage<TaskTemplate[]>('task-templates', []);
-  const [settings, setSettings] = useLocalStorage<AppSettings>('app-settings', defaultSettings);
+  // Enhanced localStorage with auto-save and backup
+  const [lists, setLists] = useLocalStorage<TodoList[]>('task-flow-lists', [createDefaultList()]);
+  const [templates, setTemplates] = useLocalStorage<TaskTemplate[]>('task-flow-templates', []);
+  const [settings, setSettings] = useLocalStorage<AppSettings>('task-flow-settings', defaultSettings);
+  
+  // Additional persisted state for better user experience
+  // const [calendarEvents, setCalendarEvents] = useLocalStorage<CalendarEvent[]>('task-flow-calendar-events', []);
+  const [lastActiveListId, setLastActiveListId] = useLocalStorage<string | null>('task-flow-last-active-list', null);
+  const [persistedSearchFilters, setPersistedSearchFilters] = useLocalStorage<SearchFilters>('task-flow-search-filters', {
+    query: '',
+    priority: undefined,
+    completed: undefined,
+    dueDate: undefined,
+    assignee: undefined,
+  });
+
+  // UI state (not persisted)
   const [showListCreator, setShowListCreator] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -136,15 +151,8 @@ function App() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeList, setActiveList] = useState<TodoList | null>(null);
-  const [activeListId, setActiveListId] = useState<string | null>(null);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
-    query: '',
-    priority: undefined,
-    completed: undefined,
-    tags: [],
-    dueDate: undefined,
-    assignee: undefined,
-  });
+  const [activeListId, setActiveListId] = useState<string | null>(lastActiveListId);
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>(persistedSearchFilters);
 
   // Drag state for DragPreview
   const [dragState, setDragState] = useState<{
@@ -210,6 +218,85 @@ function App() {
       }
     }
   }, [settings.notifications.enabled, settings.notifications.push]);
+
+  // Sync activeListId to localStorage
+  useEffect(() => {
+    if (activeListId !== lastActiveListId) {
+      setLastActiveListId(activeListId);
+    }
+  }, [activeListId, lastActiveListId, setLastActiveListId]);
+
+  // Sync searchFilters to localStorage (debounced)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setPersistedSearchFilters(searchFilters);
+    }, 500); // 500ms debounce to avoid too frequent saves
+
+    return () => clearTimeout(timeoutId);
+  }, [searchFilters, setPersistedSearchFilters]);
+
+  // Initialize activeListId from persisted state
+  useEffect(() => {
+    if (lastActiveListId && !activeListId && lists.some(list => list.id === lastActiveListId)) {
+      setActiveListId(lastActiveListId);
+    }
+  }, [lastActiveListId, activeListId, lists]);
+
+  // Comprehensive auto-save effect - saves all data when any important state changes
+  useEffect(() => {
+    if (settings.autoSave) {
+      const saveData = () => {
+        saveToLocalStorage({
+          lists,
+          templates,
+          settings,
+          // calendarEvents, // TODO: Add when EventCalendar component is implemented
+          lastActiveListId: activeListId,
+          searchFilters
+        });
+      };
+
+      // Debounce saves to avoid too frequent writes
+      const timeoutId = setTimeout(saveData, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [lists, templates, settings, activeListId, searchFilters, settings.autoSave]);
+
+  // Load initial data on app start
+  useEffect(() => {
+    const loadInitialData = () => {
+      try {
+        const savedState = loadFromLocalStorage();
+        console.log('🚀 TaskFlow app initialized, localStorage data loaded');
+        
+        // The useLocalStorage hooks will handle the actual loading
+        // This is just for logging and potential recovery scenarios
+      } catch (error) {
+        console.error('❌ Error during initial data load:', error);
+      }
+    };
+
+    loadInitialData();
+  }, []); // Run only once on mount
+
+  // Save data before page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (settings.autoSave) {
+        saveToLocalStorage({
+          lists,
+          templates,
+          settings,
+          // calendarEvents, // TODO: Add when EventCalendar component is implemented
+          lastActiveListId: activeListId,
+          searchFilters
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [lists, templates, settings, activeListId, searchFilters, settings.autoSave]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -584,6 +671,28 @@ function App() {
     );
   };
 
+  // Calendar Events Management (ready for future EventCalendar component)
+  /*
+  const handleEventAdd = (event: CalendarEvent) => {
+    setCalendarEvents(prev => [...prev, event]);
+  };
+
+  const handleEventUpdate = (updatedEvent: CalendarEvent) => {
+    setCalendarEvents(prev => prev.map(event => 
+      event.id === updatedEvent.id ? updatedEvent : event
+    ));
+  };
+
+  const handleEventDelete = (eventId: string) => {
+    setCalendarEvents(prev => prev.filter(event => event.id !== eventId));
+  };
+
+  // Helper function for creating tasks from calendar events
+  const handleTaskCreateFromEvent = (listId: string, title: string, dueDate?: Date) => {
+    handleAddTask(listId, title, 'medium', dueDate);
+  };
+  */
+
   // Settings management with proper persistence
   const handleUpdateSettings = (newSettings: AppSettings) => {
     setSettings(newSettings);
@@ -613,7 +722,13 @@ function App() {
 
   const handleClearData = () => {
     if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
-      clearAllData();
+      // Create backup before clearing
+      createBackup();
+      
+      // Clear all localStorage data
+      clearAllLocalStorage();
+      
+      // Reload the page to reset the app state
       window.location.reload();
     }
   };
