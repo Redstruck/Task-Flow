@@ -37,6 +37,12 @@ export function useLocalStorage<T>(key: string, initialValue: T, useDeepMerge: b
         
         console.log(`📖 Loaded ${key}:`, Array.isArray(parsed) ? `${parsed.length} items` : 'data loaded');
         
+        // Array type validation - ensure arrays remain arrays
+        if (Array.isArray(initialValue) && !Array.isArray(parsed)) {
+          console.warn(`⚠️ Expected array for ${key} but got ${typeof parsed}, using default value`);
+          return initialValue;
+        }
+        
         // Use deep merge for settings to ensure all nested properties exist
         if (useDeepMerge && key === 'task-flow-settings') {
           return deepMerge(initialValue, parsed);
@@ -59,6 +65,12 @@ export function useLocalStorage<T>(key: string, initialValue: T, useDeepMerge: b
           // Check if backup parsed value is null or undefined
           if (parsed === null || parsed === undefined) {
             console.log(`🆕 Backup parsed value is null for ${key}, using default value`);
+            return initialValue;
+          }
+          
+          // Array type validation for backup recovery too
+          if (Array.isArray(initialValue) && !Array.isArray(parsed)) {
+            console.warn(`⚠️ Expected array for backup ${key} but got ${typeof parsed}, using default value`);
             return initialValue;
           }
           
