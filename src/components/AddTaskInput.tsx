@@ -31,6 +31,17 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
     }
   };
 
+  const handleInputFocus = () => {
+    setShowOptions(true);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+    if (!showOptions && e.target.value.trim()) {
+      setShowOptions(true);
+    }
+  };
+
   const priorityColors = {
     low: 'text-green-600 bg-green-50 border-green-200 hover:bg-green-100',
     medium: 'text-yellow-600 bg-yellow-50 border-yellow-200 hover:bg-yellow-100',
@@ -51,7 +62,8 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={handleInputChange}
+              onFocus={handleInputFocus}
               placeholder="Add a new task..."
               className="w-full px-4 py-3.5 text-sm border border-gray-200/70 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-300 transition-all duration-200 bg-white/70 backdrop-blur-sm placeholder-gray-400 hover:border-gray-300"
             />
@@ -59,19 +71,6 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
               <Sparkles className="absolute right-3 top-3.5 w-4 h-4 text-blue-400 animate-pulse" />
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setShowOptions(!showOptions)}
-            className={`flex-shrink-0 p-3.5 rounded-xl transition-all duration-200 hover:shadow-md ${
-              showOptions 
-                ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 shadow-md' 
-                : 'bg-gray-100/70 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700/80'
-            }`}
-          >
-            <span className={`text-xs font-medium transition-transform ${showOptions ? 'scale-110' : ''}`}>
-              {priority === 'high' ? 'H' : priority === 'medium' ? 'M' : 'L'}
-            </span>
-          </button>
           <button
             type="submit"
             disabled={!title.trim()}
