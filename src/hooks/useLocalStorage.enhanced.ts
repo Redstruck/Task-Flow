@@ -1,13 +1,40 @@
 import { useState, useEffect } from 'react';
 
+// Deep merge utility function
+function deepMerge<T>(target: T, source: Partial<T>): T {
+  const result = { ...target };
+  
+  for (const key in source) {
+    if (source.hasOwnProperty(key)) {
+      const sourceValue = source[key];
+      const targetValue = result[key];
+      
+      if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue) &&
+          targetValue && typeof targetValue === 'object' && !Array.isArray(targetValue)) {
+        result[key] = deepMerge(targetValue, sourceValue);
+      } else if (sourceValue !== undefined) {
+        result[key] = sourceValue;
+      }
+    }
+  }
+  
+  return result;
+}
+
 // Enhanced useLocalStorage hook with error handling and backup
-export function useLocalStorage<T>(key: string, initialValue: T) {
+export function useLocalStorage<T>(key: string, initialValue: T, useDeepMerge: boolean = false) {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
       if (item) {
         const parsed = JSON.parse(item);
         console.log(`📖 Loaded ${key}:`, Array.isArray(parsed) ? `${parsed.length} items` : 'data loaded');
+        
+        // Use deep merge for settings to ensure all nested properties exist
+        if (useDeepMerge && key === 'task-flow-settings') {
+          return deepMerge(initialValue, parsed);
+        }
+        
         return parsed;
       }
       console.log(`🆕 Initializing ${key} with default value`);
@@ -21,6 +48,12 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
         if (backup) {
           console.log(`🔄 Attempting recovery from backup for "${key}"`);
           const parsed = JSON.parse(backup);
+          
+          // Use deep merge for settings backup recovery too
+          if (useDeepMerge && key === 'task-flow-settings') {
+            return deepMerge(initialValue, parsed);
+          }
+          
           return parsed;
         }
       } catch (backupError) {
@@ -96,8 +129,8 @@ function cleanupOldData() {
 }
 
 // Enhanced localStorage with automatic periodic saves
-export function usePersistedState<T>(key: string, initialValue: T, autoSaveInterval = 30000) {
-  const [storedValue, setValue] = useLocalStorage(key, initialValue);
+export function usePersistedState<T>(key: string, initialValue: T, autoSaveInterval = 30000, useDeepMerge: boolean = false) {
+  const [storedValue, setValue] = useLocalStorage(key, initialValue, useDeepMerge);
   
   // Auto-save periodically
   useEffect(() => {
