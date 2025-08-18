@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, Flag, User, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Clock, User, FileText } from 'lucide-react';
 import { Task, TodoList } from '../types';
 
 interface CalendarViewProps {
@@ -30,6 +30,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
 
   // Get all tasks with their list information
   const allTasksWithList = useMemo(() => {
@@ -266,10 +267,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
                                 task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                                 'bg-green-100 text-green-800'
                               }`}>
-                                <Flag className={`w-3 h-3 mr-1 ${
-                                  task.priority === 'high' ? 'text-red-600' :
-                                  task.priority === 'medium' ? 'text-yellow-600' : 'text-green-600'
-                                }`} />
                                 {task.priority}
                               </span>
                             </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Flag, Sparkles } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import { Task } from '../types';
 import { DatePicker } from './DatePicker';
 
@@ -68,7 +68,9 @@ const AddTaskInput: React.FC<AddTaskInputProps> = ({ onAddTask, defaultPriority 
                 : 'bg-gray-100/70 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-700/80'
             }`}
           >
-            <Flag className={`w-4 h-4 transition-transform ${showOptions ? 'scale-110' : ''}`} />
+            <span className={`text-xs font-medium transition-transform ${showOptions ? 'scale-110' : ''}`}>
+              {priority === 'high' ? 'H' : priority === 'medium' ? 'M' : 'L'}
+            </span>
           </button>
           <button
             type="submit"

@@ -987,12 +987,6 @@
   color: #fdfdfd;
 }
 
-/* Flag icons */
-.dark [data-lucide="flag"],
-.dark .flag-icon {
-  color: #fdfdfd;
-}
-
 /* Settings and other utility icons */
 .dark [data-lucide="settings"],
 .dark [data-lucide="bell"],
@@ -1031,13 +1025,6 @@
 .dark .btn:hover svg {
   color: #4b5563; /* text-gray-600 - most common light mode icon color */
   opacity: 1;
-}
-
-/* Priority flag icons with enhanced visibility */
-.dark .priority-high svg,
-.dark .priority-medium svg,
-.dark .priority-low svg {
-  color: #fdfdfd;
 }
 
 /* Task item icons */
@@ -1085,13 +1072,5 @@
 .dark .settings-modal:hover svg,
 .dark .modal:hover svg {
   color: #4b5563; /* text-gray-600 */
-  opacity: 1;
-}
-
-/* Priority flag hover effects - light mode colors */
-.dark .priority-high:hover svg,
-.dark .priority-medium:hover svg,
-.dark .priority-low:hover svg {
-  color: #6b7280; /* text-gray-500 */
   opacity: 1;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, AlertCircle, Edit3, Clock, Flag } from 'lucide-react';
+import { Check, X, AlertCircle, Edit3, Clock } from 'lucide-react';
 import { Task } from '../types';
 import { getPriorityColor, formatDueDate } from '../utils/taskUtils';
 import TimeTracking from './TimeTracking';
@@ -130,10 +130,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-center space-x-1">
-                  <Flag className={`w-3 h-3 ${
-                    priority === 'high' ? 'text-red-500' :
-                    priority === 'medium' ? 'text-yellow-500' : 'text-green-500'
-                  }`} />
                   <span className="capitalize">{priority}</span>
                 </div>
               </button>
@@ -228,10 +224,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center space-x-2 flex-wrap">
               <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border transition-all duration-200 ${getPriorityColor(task.priority)}`}>
-                <Flag className={`w-3 h-3 mr-1 ${
-                  task.priority === 'high' ? 'text-red-600' :
-                  task.priority === 'medium' ? 'text-yellow-600' : 'text-green-600'
-                }`} />
                 <span className="capitalize">{task.priority}</span>
               </span>
               
