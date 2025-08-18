@@ -202,6 +202,39 @@ App.tsx (Root Component)
 - ✅ All core task management functionality
 - ✅ Search and filtering (excluding tag-based filtering)
 
+### August 2025 - TaskStats Total Count Fix
+**Update**: Fixed "Total Tasks" count in TaskStats component to only display active (incomplete) tasks, excluding completed tasks from the total.
+
+**Problem Identified**:
+- TaskStats component was showing "Total Tasks" as all tasks (completed + incomplete)
+- This was misleading for users who expected the total to represent active work
+- The `getTaskStats` function in `taskUtils.ts` was using `tasks.length` which included all tasks
+
+**Solution Implemented**:
+- Modified `getTaskStats` function in `src/utils/taskUtils.ts`
+- Changed total calculation from `tasks.length` to `tasks.filter(task => !task.completed).length`
+- This ensures "Total Tasks" reflects only active tasks requiring attention
+
+**Technical Changes**:
+```typescript
+// Before (line 201)
+const total = tasks.length;
+
+// After (line 201)
+const total = tasks.filter(task => !task.completed).length;
+```
+
+**Impact**:
+- ✅ **Accurate Statistics**: "Total Tasks" now shows only active tasks
+- ✅ **Better User Experience**: Clear representation of remaining work
+- ✅ **Preserved Functionality**: Other stats (completed, overdue, high priority) remain unchanged
+- ✅ **Backward Compatible**: No breaking changes to existing data or components
+
+**User Benefits**:
+- Users see accurate count of tasks requiring attention
+- Dashboard statistics better reflect actual workload
+- Improved clarity in task management overview
+
 ### August 2025 - Comprehensive LocalStorage Implementation
 **Update**: Implemented enterprise-grade automatic localStorage persistence for all application data with backup/recovery systems.
 
